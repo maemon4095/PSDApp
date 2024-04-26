@@ -1,0 +1,13 @@
+{
+    "deno.enable": true,
+    "deno.disablePaths": [
+        "./crates"
+    ],
+    "files.associations": {
+        "*.css": "tailwindcss"
+    },
+    "editor.quickSuggestions": {
+        "strings": "on"
+    },
+    "extensions.ignoreRecommendations": false
+}
