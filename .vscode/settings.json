@@ -1,7 +1,9 @@
 {
     "deno.enable": true,
     "deno.disablePaths": [
-        "./crates"
+        "./crates",
+        "./dist",
+        "./generated"
     ],
     "files.associations": {
         "*.css": "tailwindcss"

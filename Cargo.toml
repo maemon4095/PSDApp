@@ -3,4 +3,3 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.dependencies]
-psd = "0.3"
