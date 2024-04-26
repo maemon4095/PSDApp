@@ -5,9 +5,10 @@
     "jsxFragmentFactory": "Fragment"
   },
   "imports": {
-    "$std/": "https://deno.land/std@0.204.0/",
+    "~/": "./src/",
     "preact": "https://esm.sh/preact@10.19.7",
     "preact/hooks": "https://esm.sh/preact@10.19.7/hooks",
+    "preact-router": "npm:preact-router",
     "@types/file.d.ts": "../../plugins/loaderOverride/types/file.d.ts"
   },
   "tasks": {

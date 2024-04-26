@@ -1,5 +1,5 @@
 export default {
-    content: ["./src-ui/**/*.{tsx, ts}"],
+    content: ["./src/**/*.{tsx, ts}"],
     theme: {
         extend: {},
     },

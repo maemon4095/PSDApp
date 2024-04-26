@@ -9,3 +9,10 @@ html, body {
     height: 100%;
     overflow: hidden;
 }
+
+*[dragover] {
+    --dragover-color: #b2d9f8b2;
+    --dragover-border-color: #215ecfb2;
+    border: var(--dragover-border-color) dashed 2px;
+    background-color: var(--dragover-color);
+}
