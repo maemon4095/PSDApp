@@ -8,16 +8,21 @@ const mode = Deno.args.at(0);
 if (mode === undefined) {
     throw new Error("no mode was provided");
 }
+const artifactsDir = `${import.meta.dirname}/artifacts`;
+const distDir = `${artifactsDir}/dist`;
+const genDir = `${artifactsDir}/generated`;
 
 const options: BuilderOptions = {
-    documentFilePath: "./src-ui/index.html",
+    documentFilePath: "./src/index.html",
     denoConfigPath: "./deno.json",
-    outdir: "./artifacts/dist",
-    outbase: "./src-ui",
+    outdir: distDir,
+    outbase: "./src",
     serve: {
-        watch: ["./src-ui"]
+        watch: ["./src"]
     },
-    loader: {},
+    loader: {
+        ".wasm": "file"
+    },
     esbuildPlugins: [
         postCssPlugin({
             plugins: [
@@ -47,7 +52,13 @@ switch (mode) {
 }
 
 async function generate() {
-    const targetDir = `${import.meta.dirname}/artifacts/generated`;
-    await $`wasm-pack build ./crates/psdapp --mode no-install --target web -d ${targetDir}`;
+    const scriptFileName = "psdapp";
+    await $`wasm-pack build ./crates/psdapp --mode no-install --target web --out-name ${scriptFileName} -d ${genDir}`;
 
+    const scriptFilePath = `${genDir}/${scriptFileName}.js`;
+    const wasmFilePath = `${scriptFileName}_bg.wasm`;
+    let scriptText = await Deno.readTextFile(scriptFilePath);
+    scriptText = `import __wasmFilePath from './${wasmFilePath}';\n${scriptText}`;
+    scriptText = scriptText.replaceAll(`new URL('${wasmFilePath}', import.meta.url)`, "__wasmFilePath");
+    await Deno.writeTextFile(scriptFilePath, scriptText);
 }
