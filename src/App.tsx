@@ -9,7 +9,7 @@ import {
 } from "preact";
 import Home from "~/pages/Home.tsx";
 import PSDView from "~/pages/PSDView.tsx";
-import { createSwitcher } from "~/meta/Switcher.tsx";
+import { createSwitcher } from "~/components/Switcher.tsx";
 
 const routes = {
   home: Home,
