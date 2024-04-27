@@ -1,14 +1,12 @@
 import { Fragment, h } from "preact";
-import { route } from "preact-router";
+import { switcher } from "~/App.tsx";
 
-export default function PSDView({ blob }: { blob?: string }) {
-  if (blob === undefined) {
-    route("/");
+export default function PSDView({ file }: { file: File }) {
+  if (file === undefined) {
+    switcher.switch("home");
     return <></>;
   }
 
-  fetch(blob).then(async (e) => await e.blob()).then((b) => {
-    console.log(b);
-  });
+  console.log(file);
   return <div></div>;
 }

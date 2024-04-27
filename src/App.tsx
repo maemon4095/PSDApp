@@ -1,14 +1,25 @@
-import { h } from "preact";
-// @deno-types="./@types/preact-router.d.ts"
-import Router from "preact-router";
+import {
+  Attributes,
+  Component,
+  ComponentChild,
+  ComponentChildren,
+  Fragment,
+  h,
+  Ref,
+} from "preact";
 import Home from "~/pages/Home.tsx";
 import PSDView from "~/pages/PSDView.tsx";
+import { createSwitcher } from "~/meta/Switcher.tsx";
+
+const routes = {
+  home: Home,
+  viewer: PSDView,
+} as const;
+
+const [Switcher, switcher] = createSwitcher(routes);
+
+export { switcher };
 
 export default function App() {
-  return (
-    <Router>
-      <Home path="/"></Home>
-      <PSDView path="/viewer/:blob"></PSDView>
-    </Router>
-  );
+  return <Switcher initialPath="home" />;
 }

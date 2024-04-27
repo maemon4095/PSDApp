@@ -1,14 +1,12 @@
 import { h } from "preact";
-import { route } from "preact-router";
+import { switcher } from "~/App.tsx";
 
 export default function Home() {
   const onFileSubmit = (files: FileList | null | undefined) => {
     if (!files) return;
     const file = files.item(0);
     if (!file) return;
-
-    const url = URL.createObjectURL(file);
-    route(`/viewer/${encodeURIComponent(url)}`);
+    switcher.switch("viewer", { file });
   };
 
   return (

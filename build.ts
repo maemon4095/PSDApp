@@ -17,6 +17,9 @@ const options: BuilderOptions = {
     denoConfigPath: "./deno.json",
     outdir: distDir,
     outbase: "./src",
+    minifyIdentifiers: false,
+    minifySyntax: false,
+    minifyWhitespace: false,
     serve: {
         watch: ["./src"]
     },
