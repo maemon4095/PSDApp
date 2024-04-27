@@ -11,15 +11,15 @@ import Home from "~/pages/Home.tsx";
 import PSDView from "~/pages/PSDView.tsx";
 import { createSwitcher } from "~/components/Switcher.tsx";
 
-const routes = {
+const paths = {
   home: Home,
   viewer: PSDView,
 } as const;
 
-const [Switcher, switcher] = createSwitcher(routes);
+const [Switcher, switcher] = createSwitcher(paths);
 
 export { switcher };
 
 export default function App() {
-  return <Switcher initialPath="home" />;
+  return <Switcher path="home" />;
 }

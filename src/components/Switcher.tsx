@@ -62,11 +62,11 @@ export function createSwitcher<T extends Paths>(
 type SwitcherComponentProps<T extends Paths> = {
   // if component does not take props, allow omit initialProps
   [p in PathOf<T>]: void extends PropsOf<T[p]> ? {
-      initialPath: p;
+      path: p;
     }
     : {
-      initialPath: p;
-      initialProps: PropsOf<T[p]>;
+      path: p;
+      props: PropsOf<T[p]>;
     };
 }[PathOf<T>];
 
@@ -83,10 +83,10 @@ export class SwitcherComponentBase<T extends Paths> extends Component<
   }
 
   override componentWillMount(): void {
-    const path = this.props.initialPath;
+    const path = this.props.path;
     const props = (() => {
-      if ("initialProps" in this.props) {
-        return this.props.initialProps;
+      if ("props" in this.props) {
+        return this.props.props;
       } else {
         return undefined;
       }
@@ -100,7 +100,6 @@ export class SwitcherComponentBase<T extends Paths> extends Component<
 
   override render(): ComponentChild {
     const { path, props } = this.state;
-    console.log(this.state);
     const Comp = this.#paths[path];
     return <Comp {...props}></Comp>;
   }
