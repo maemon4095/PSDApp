@@ -3,25 +3,44 @@ import { Builder, BuilderOptions } from "https://raw.githubusercontent.com/maemo
 import tailwindcss from "npm:tailwindcss";
 import postCssPlugin from "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.0/plugins/postCssPlugin.ts";
 import tailwindConfig from "./tailwind.config.js";
+import { parseArgs } from "https://deno.land/std@0.221.0/cli/mod.ts";
 
-const mode = Deno.args.at(0);
+const args = parseArgs(Deno.args, {
+    "boolean": ["dev"]
+});
+const mode = args._[0];
+const is_dev = args.dev;
 if (mode === undefined) {
     throw new Error("no mode was provided");
 }
+
+switch (mode) {
+    case "gen":
+    case "serve":
+    case "build": break;
+    default: {
+        console.log(`unrecognized mode: ${mode}`);
+        Deno.exit(1);
+    }
+}
+
 const artifactsDir = `${import.meta.dirname}/artifacts`;
 const distDir = `${artifactsDir}/dist`;
 const genDir = `${artifactsDir}/generated`;
 
-const options: BuilderOptions = {
+if (mode === "gen") {
+    generate(is_dev);
+    Deno.exit();
+}
+
+const options = {
     documentFilePath: "./src/index.html",
     denoConfigPath: "./deno.json",
     outdir: distDir,
-    outbase: "./src",
-    minifyIdentifiers: false,
-    minifySyntax: false,
-    minifyWhitespace: false,
+    clearDistDir: true,
+    treeShaking: true,
     serve: {
-        watch: ["./src"]
+        watch: ["./src", "./crates"]
     },
     loader: {
         ".wasm": "file"
@@ -31,32 +50,34 @@ const options: BuilderOptions = {
             plugins: [
                 tailwindcss(tailwindConfig)
             ]
-        })
+        }),
+        {
+            name: "rust bundle",
+            setup(build) {
+                build.onStart(async () => {
+                    await generate(is_dev);
+                });
+            }
+        }
     ]
-};
-
+} satisfies BuilderOptions;
 const builder = new Builder(options);
 
 switch (mode) {
-    case "gen": {
-        await generate();
-        break;
-    }
     case "serve": {
-        await generate();
         await builder.serve();
         break;
     }
     case "build": {
-        await generate();
         await builder.build();
         break;
     }
 }
 
-async function generate() {
+async function generate(dev: boolean) {
     const scriptFileName = "psdapp";
-    await $`wasm-pack build ./crates/psdapp --mode no-install --target web --out-name ${scriptFileName} -d ${genDir}`;
+    const profile = dev ? "--dev" : "--release";
+    await $`wasm-pack build ./crates/psdapp ${profile} --mode no-install --target web --out-name ${scriptFileName} -d ${genDir}`;
 
     const scriptFilePath = `${genDir}/${scriptFileName}.js`;
     const wasmFilePath = `${scriptFileName}_bg.wasm`;

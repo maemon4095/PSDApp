@@ -38,6 +38,7 @@ pub async fn get_layers(callback: &js_sys::Function) -> Result<(), AnyError> {
     let Some(state) = STATE.get() else {
         return Err(PsdAppNotInitializedError.into());
     };
+    // レイヤーは背面から順らしい？
 
     let layers = state.psd.layers();
     for layer in layers {
@@ -71,6 +72,26 @@ pub async fn get_groups(callback: &js_sys::Function) -> Result<(), AnyError> {
         .map_err(AnyError::from_jsvalue)?;
 
     Ok(())
+}
+
+#[wasm_bindgen]
+pub fn get_layer_count() -> Result<usize, AnyError> {
+    let Some(state) = STATE.get() else {
+        return Err(PsdAppNotInitializedError.into());
+    };
+
+    let len = state.psd.layers().len();
+    Ok(len)
+}
+
+#[wasm_bindgen]
+pub fn get_group_count() -> Result<usize, AnyError> {
+    let Some(state) = STATE.get() else {
+        return Err(PsdAppNotInitializedError.into());
+    };
+
+    let len = state.psd.groups().len();
+    Ok(len)
 }
 
 #[wasm_bindgen]

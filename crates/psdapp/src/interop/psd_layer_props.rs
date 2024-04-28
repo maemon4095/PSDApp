@@ -24,7 +24,8 @@ impl<'a> Serialize for PsdLayerProps<'a> {
             parent_id
         );
 
-        // blend_mode
+        let blend_mode = self.0.blend_mode() as usize;
+        map.serialize_entry("blend_mode", &blend_mode)?;
 
         map.end()
     }

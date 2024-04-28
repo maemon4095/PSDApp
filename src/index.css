@@ -1,4 +1,4 @@
-@config "../tailwind.config.js";
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -15,4 +15,24 @@ html, body {
     --dragover-border-color: #215ecfb2;
     border: var(--dragover-border-color) dashed 2px;
     background-color: var(--dragover-color);
+}
+
+@layer components {
+    .popup-bg {
+        position: fixed;
+        display: grid;
+        place-content: center;
+        left: 0;
+        top:0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 100000;
+        backdrop-filter: blur(4px) brightness(60%);
+    }
+
+    .child-full {
+        display: grid;
+        grid-auto-rows: 1fr;
+        grid-auto-columns: 1fr;
+    }
 }

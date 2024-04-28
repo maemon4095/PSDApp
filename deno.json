@@ -12,8 +12,9 @@
     "@types/file.d.ts": "../../plugins/loaderOverride/types/file.d.ts"
   },
   "tasks": {
-    "dev": "deno run -A ./build.ts serve",
-    "build": "deno run -A ./build.ts build",
-    "gen": "deno run -A ./build.ts gen"
+    "dev": "deno run -A build.ts serve",
+    "build": "deno run -A build.ts build",
+    "gen": "deno run -A build.ts gen",
+    "preview": "deno run -A ./preview/build.ts"
   }
 }
