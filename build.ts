@@ -26,7 +26,8 @@ const options = {
         watch: ["./src"]
     },
     loader: {
-        ".wasm": "file"
+        ".wasm": "file",
+        ".png": "file"
     },
     esbuildPlugins: [
         postCssPlugin({

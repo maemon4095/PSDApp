@@ -2,7 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import { Fragment, h } from "preact";
 import { switcher } from "~/App.tsx";
 import Progress from "~/components/Progress.tsx";
-import * as PSD from "~/lib/psd.ts";
+import Psd from "psd";
 
 export default function Home() {
   const [popup, setPopup] = useState(<></>);
@@ -10,6 +10,7 @@ export default function Home() {
     if (!files) return;
     const file = files.item(0);
     if (!file) return;
+
     setPopup(<LoadingPopup file={file} />);
   };
 
@@ -51,13 +52,8 @@ function LoadingPopup({ file }: { file: File }) {
   useEffect(() => {
     (async () => {
       const f = await file.arrayBuffer();
-      console.log("file");
-      await PSD.init(new Uint8Array(f));
-      const structure = await PSD.getPsdStructure((...args) => {
-        console.log(args[0], args[1]);
-        setProgress(args);
-      });
-      switcher.switch("viewer", { structure });
+      const psd = Psd.parse(f);
+      switcher.switch("viewer", { psd });
     })();
   }, []);
   return (

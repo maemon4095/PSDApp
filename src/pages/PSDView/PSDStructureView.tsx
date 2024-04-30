@@ -1,11 +1,28 @@
 import { ComponentChildren, Fragment, h } from "preact";
-import { PsdGroup, PsdLayerProps } from "~/lib/psd.ts";
 import { useMemo, useState } from "preact/hooks";
-import { PsdGroupOrLayer } from "~/lib/psd.ts";
-import * as PSD from "~/lib/psd.ts";
+import Psd, { Group as RawGroup, Layer, NodeChild } from "psd";
+
+type Group =
+  & {
+    [p in keyof RawGroup]: RawGroup[p];
+  }
+  & HasLayerFrame;
+
+type HasLayerFrame = {
+  layerFrame: HasLayerProperties;
+};
+
+type HasLayerProperties = {
+  layerProperties: LayerProperties;
+};
+
+type LayerProperties = {
+  name: string;
+  hidden: boolean;
+};
 
 export default function PsdStrucutureView(
-  { roots }: { roots: PsdGroupOrLayer[] },
+  { roots }: { roots: NodeChild[] },
 ) {
   return (
     <ul class="[&_ul>li]:ml-4 min-w-max">
@@ -15,7 +32,7 @@ export default function PsdStrucutureView(
 }
 
 function PsdStrucutureTree(
-  { roots }: { roots: PsdGroupOrLayer[] },
+  { roots }: { roots: NodeChild[] },
 ) {
   const items = useMemo(() => roots.map((e) => <Entry elem={e} />), [roots]);
 
@@ -26,10 +43,10 @@ function PsdStrucutureTree(
   );
 }
 
-function Entry({ elem }: { elem: PsdGroupOrLayer }) {
-  const entry = elem.type === "group"
-    ? <GroupEntry group={elem.value} />
-    : <LayerEntry layer={elem.value} />;
+function Entry({ elem }: { elem: NodeChild }) {
+  const entry = elem.type === "Group"
+    ? <GroupEntry group={elem as unknown as Group} />
+    : <LayerEntry layer={elem} />;
 
   return (
     <li>
@@ -38,8 +55,8 @@ function Entry({ elem }: { elem: PsdGroupOrLayer }) {
   );
 }
 
-function LayerEntry({ layer }: { layer: PsdLayerProps }) {
-  const [visible, setVisible] = useState(layer.visible);
+function LayerEntry({ layer }: { layer: Layer }) {
+  const [visible, setVisible] = useState(!layer.isHidden);
   const indicator = (
     <input
       type="checkbox"
@@ -64,9 +81,13 @@ function LayerEntry({ layer }: { layer: PsdLayerProps }) {
   );
 }
 
-function GroupEntry({ group }: { group: PsdGroup }) {
+function GroupEntry({ group }: { group: Group & HasLayerFrame }) {
+  console.log(group);
+
   const [collapsed, setCollapsed] = useState(false);
-  const [visible, setVisible] = useState(group.visible);
+  const [visible, setVisible] = useState(
+    !group.layerFrame.layerProperties.hidden,
+  );
   const buttonIcon = collapsed ? "▶" : "▼";
   return (
     <>

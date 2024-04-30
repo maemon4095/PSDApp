@@ -1,26 +1,23 @@
 import { h } from "preact";
-import { PsdStructure } from "~/lib/psd.ts";
 import PsdStrucutureView from "~/pages/PSDView/PSDStructureView.tsx";
 import Partitioned from "~/components/Partitioned.tsx";
-import * as PSD from "~/lib/psd.ts";
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
+import Psd, { Group } from "psd";
 
-export default function PSDView({ structure }: { structure: PsdStructure }) {
-  const profile = useMemo(() => PSD.getPsdProfile(), [structure]);
-  console.log(structure);
+export default function PSDView({ psd }: { psd: Psd }) {
   return (
     <div class="size-full overflow-hidden child-full">
       <Partitioned firstSize={192} direction="row">
         <div class="overflow-auto">
-          <PsdStrucutureView roots={structure.roots} />
+          <PsdStrucutureView roots={psd.children} />
         </div>
-        <PSDCanvas profile={profile} />
+        <PSDCanvas psd={psd} />
       </Partitioned>
     </div>
   );
 }
 
-function PSDCanvas({ profile }: { profile: PSD.PsdProfile }) {
+function PSDCanvas({ psd }: { psd: Psd }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [dragging, setDragging] = useState(false);
   const [transform, setTransform] = useState({ scale: 1, x: 0, y: 0 });
@@ -31,13 +28,22 @@ function PSDCanvas({ profile }: { profile: PSD.PsdProfile }) {
   } satisfies h.JSX.CSSProperties;
 
   useEffect(() => {
-    const canvas = canvasRef.current!;
-    PSD.drawInto(canvas);
+    (async () => {
+      const canvas = canvasRef.current!;
+      const composed = await psd.composite(true, true);
+      const imageData = new ImageData(
+        composed,
+        psd.width,
+        psd.height,
+      );
+
+      canvas.getContext("2d")?.putImageData(imageData, 0, 0);
+    })();
   }, []);
 
   return (
     <div
-      class="overflow-hidden"
+      class="overflow-hidden bg-stone-500"
       onWheel={(e) => {
         const sign = Math.sign(-e.deltaY);
         setTransform((t) => ({
@@ -59,9 +65,10 @@ function PSDCanvas({ profile }: { profile: PSD.PsdProfile }) {
     >
       <canvas
         ref={canvasRef}
-        width={profile.width}
-        height={profile.height}
+        width={psd.width}
+        height={psd.height}
         style={style}
+        class="border shadow"
       />
     </div>
   );

@@ -9,12 +9,12 @@
     "~/": "./src/",
     "preact": "https://esm.sh/preact@10.19.7",
     "preact/hooks": "https://esm.sh/preact@10.19.7/hooks",
-    "@types/file.d.ts": "../../plugins/loaderOverride/types/file.d.ts"
+    "@types/file.d.ts": "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.3/plugins/loaderOverride/types/file.d.ts",
+    "psd": "npm:@webtoon/psd"
   },
   "tasks": {
     "dev": "deno run -A build.ts serve",
     "build": "deno run -A build.ts build",
-    "gen": "deno run -A build.ts gen",
     "preview": "deno run -A ./preview/build.ts"
   }
 }
