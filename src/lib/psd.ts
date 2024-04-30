@@ -74,6 +74,14 @@ export type PsdStructure = {
     readonly roots: PsdGroupOrLayer[];
 };
 
+export type PsdProfile = {
+    width: number;
+    height: number;
+    color_mode: number;
+    depth: number;
+};
+
+// combinable progress
 export async function getPsdStructure(progress?: ProgressListener): Promise<PsdStructure> {
     progress?.(0, "Start loading PSD structure.");
     const layer_count = mod.get_layer_count();
@@ -121,7 +129,7 @@ export async function getPsdStructure(progress?: ProgressListener): Promise<PsdS
     const layers: PsdLayerProps[] = [];
     for await (const layer of getLayers()) {
         loaded += 1;
-        progress?.(loaded / total, `Loading layers: ${layers.length} of ${layer_count}.`);
+        progress?.(loaded / total, `Loading layers: ${layers.length + 1} of ${layer_count}.`);
         layers.push(layer);
         const me: PsdGroupOrLayer = { type: "layer", value: layer };
         if (layer.parent_id === null) {
@@ -139,4 +147,20 @@ export async function getPsdStructure(progress?: ProgressListener): Promise<PsdS
     progress?.(1, "Done loading PSD structure.");
 
     return { groups, layers, roots };
+}
+
+export function getPsdProfile() {
+    return mod.get_psd_profile() as PsdProfile;
+}
+
+export function getLayerVisibility(name: string) {
+    return mod.get_layer_visibility(name);
+}
+
+export function getGroupVisibility(id: number) {
+    return mod.get_group_visibility(id);
+}
+
+export function drawInto(canvas: HTMLCanvasElement) {
+    mod.draw_into(canvas);
 }

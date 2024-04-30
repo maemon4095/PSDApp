@@ -51,10 +51,12 @@ function LoadingPopup({ file }: { file: File }) {
   useEffect(() => {
     (async () => {
       const f = await file.arrayBuffer();
+      console.log("file");
       await PSD.init(new Uint8Array(f));
-      const structure = await PSD.getPsdStructure((...args) =>
-        setProgress(args)
-      );
+      const structure = await PSD.getPsdStructure((...args) => {
+        console.log(args[0], args[1]);
+        setProgress(args);
+      });
       switcher.switch("viewer", { structure });
     })();
   }, []);

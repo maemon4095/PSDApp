@@ -1,4 +1,3 @@
-/artifacts
 /deno.lock
-/Cargo.lock
+/dist
 /preview/dist

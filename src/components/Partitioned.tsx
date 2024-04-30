@@ -4,7 +4,9 @@ import { ComponentChildren, Fragment, h, toChildArray } from "preact";
 type Direction = "row" | "column";
 
 const handleSize = 13;
-
+// ハンドルの移動で他のハンドルが移動しないようにしたい。
+// 各Paneのサイズを保持すればよさそう。
+// 初期サイズもうまく調整できるようにしたい。比率で調節できればよい。
 export default function Partitioned(
   props: {
     firstSize?: number;
@@ -38,7 +40,7 @@ export default function Partitioned(
     return (
       <>
         <div
-          class="child-full"
+          class="child-full min-h-0 min-w-0 overflow-hidden"
           style={{
             flexBasis: `${firstSize}px`,
           }}
@@ -51,7 +53,7 @@ export default function Partitioned(
             setDragOffset([e.offsetX, e.offsetY]);
           }}
         />
-        <div class="child-full flex-1">
+        <div class="child-full flex-1 min-h-0 min-w-0 overflow-hidden">
           {last}
         </div>
       </>
@@ -88,7 +90,7 @@ export default function Partitioned(
     <div
       ref={containerRef}
       onPointerMove={onPointerMove}
-      class="flex items-stretch"
+      class="flex items-stretch overflow-hidden"
       style={{ flexDirection: props.direction }}
     >
       {contents}
@@ -117,7 +119,7 @@ function Handle(
         e.preventDefault();
         props.onPointerDown?.(e);
       }}
-      class="flex justify-center"
+      class="flex justify-center shadow-inner"
       style={style}
     >
       <div

@@ -17,7 +17,7 @@ html, body {
     background-color: var(--dragover-color);
 }
 
-@layer components {
+@layer utilities {
     .popup-bg {
         position: fixed;
         display: grid;
@@ -36,5 +36,12 @@ html, body {
         grid-auto-columns: 1fr;
     }    
 
-    
+
+    .attrhide[data-hidden=true] {
+        opacity: 0.3;
+    }
+
+    .pointer-none-on-attrhide[data-hidden=true] {
+        pointer-events: none;
+    }
 }
