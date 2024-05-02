@@ -17,6 +17,20 @@ html, body {
     background-color: var(--dragover-color);
 }
 
+input[type="number"]::-webkit-outer-spin-button, 
+input[type="number"]::-webkit-inner-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+} 
+
+input[type="number"] { 
+    appearance:textfield; 
+} 
+
+input:invalid {
+    @apply bg-red-300;
+}
+
 @layer utilities {
     .popup-bg {
         position: fixed;

@@ -1,40 +1,28 @@
 import { ComponentChildren, Fragment, h } from "preact";
 import { useMemo, useState } from "preact/hooks";
-import Psd, { Group as RawGroup, Layer, NodeChild } from "psd";
+import { Group, Layer } from "~/lib/psd.ts";
 
-type Group =
-  & {
-    [p in keyof RawGroup]: RawGroup[p];
-  }
-  & HasLayerFrame;
-
-type HasLayerFrame = {
-  layerFrame: HasLayerProperties;
-};
-
-type HasLayerProperties = {
-  layerProperties: LayerProperties;
-};
-
-type LayerProperties = {
-  name: string;
-  hidden: boolean;
+type Callbacks = {
+  onChange: () => void;
 };
 
 export default function PsdStrucutureView(
-  { roots }: { roots: NodeChild[] },
+  { roots, ...callbacks }: { roots: (Layer | Group)[] } & Callbacks,
 ) {
   return (
     <ul class="[&_ul>li]:ml-4 min-w-max">
-      <PsdStrucutureTree roots={roots} />
+      <PsdStrucutureTree roots={roots} {...callbacks} />
     </ul>
   );
 }
 
 function PsdStrucutureTree(
-  { roots }: { roots: NodeChild[] },
+  { roots, ...callbacks }: { roots: (Layer | Group)[] } & Callbacks,
 ) {
-  const items = useMemo(() => roots.map((e) => <Entry elem={e} />), [roots]);
+  const items = useMemo(
+    () => roots.map((e) => <Entry elem={e} {...callbacks} />),
+    [roots, callbacks],
+  );
 
   return (
     <>
@@ -43,10 +31,10 @@ function PsdStrucutureTree(
   );
 }
 
-function Entry({ elem }: { elem: NodeChild }) {
+function Entry({ elem, ...callbacks }: { elem: Layer | Group } & Callbacks) {
   const entry = elem.type === "Group"
-    ? <GroupEntry group={elem as unknown as Group} />
-    : <LayerEntry layer={elem} />;
+    ? <GroupEntry group={elem as unknown as Group} {...callbacks} />
+    : <LayerEntry layer={elem} {...callbacks} />;
 
   return (
     <li>
@@ -55,40 +43,54 @@ function Entry({ elem }: { elem: NodeChild }) {
   );
 }
 
-function LayerEntry({ layer }: { layer: Layer }) {
-  const [visible, setVisible] = useState(!layer.isHidden);
+function LayerEntry({ layer, onChange }: { layer: Layer } & Callbacks) {
+  const [visible, rawSetVisible] = useState(layer.visible);
+  const setVisible = (e: boolean) => {
+    if (e === visible) {
+      return;
+    }
+    rawSetVisible(e);
+    layer.visible = e;
+    onChange?.();
+  };
+
   const indicator = (
     <input
       type="checkbox"
       checked={visible}
       onClick={(e) => e.stopPropagation()}
-      onInput={() => setVisible((e) => !e)}
+      onInput={() => setVisible(!visible)}
     />
   );
+
   return (
     <HeaderContainer
       indicator={indicator}
-      onClick={() => setVisible((e) => !e)}
+      onClick={() => setVisible(!visible)}
     >
       <span
         data-hidden={!visible}
         class="flex flex-row items-center gap-1 attrhide "
       >
-        <canvas src="" class="border size-4" />
         <span>{layer.name}</span>
       </span>
     </HeaderContainer>
   );
 }
 
-function GroupEntry({ group }: { group: Group & HasLayerFrame }) {
-  console.log(group);
-
-  const [collapsed, setCollapsed] = useState(false);
-  const [visible, setVisible] = useState(
-    !group.layerFrame.layerProperties.hidden,
-  );
+function GroupEntry({ group, onChange }: { group: Group } & Callbacks) {
+  const [collapsed, setCollapsed] = useState(!group.visible);
+  const [visible, rawSetVisible] = useState(group.visible);
   const buttonIcon = collapsed ? "▶" : "▼";
+  const setVisible = (e: boolean) => {
+    if (e === visible) {
+      return;
+    }
+    rawSetVisible(e);
+    group.visible = e;
+    onChange?.();
+  };
+
   return (
     <>
       <HeaderContainer
@@ -99,7 +101,7 @@ function GroupEntry({ group }: { group: Group & HasLayerFrame }) {
           data-hidden={!visible}
           onClick={(e) => {
             e.stopPropagation();
-            setVisible((e) => !e);
+            setVisible(!visible);
           }}
           class="border px-1 bg-white attrhide"
         >
@@ -112,7 +114,7 @@ function GroupEntry({ group }: { group: Group & HasLayerFrame }) {
         data-hidden={!visible}
         class="attrhide pointer-none-on-attrhide"
       >
-        <PsdStrucutureTree roots={group.children} />
+        <PsdStrucutureTree roots={group.children} onChange={onChange} />
       </ul>
     </>
   );

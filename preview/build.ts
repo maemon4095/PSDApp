@@ -1,4 +1,4 @@
-import { Builder, BuilderOptions } from "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.3/src/mod.ts";
+import { Builder, BuilderOptions } from "file:///C:/Users/maemon/repos/deno-esbuilder/src/mod.ts";
 import tailwindcss from "npm:tailwindcss";
 import postCssPlugin from "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.3/plugins/postCssPlugin.ts";
 import tailwindConfig from "../tailwind.preview.config.js";
@@ -12,9 +12,6 @@ const options = {
     serve: {
         watch: [resolve("../src"), resolve("./src")]
     },
-    loader: {
-        ".wasm": "file"
-    },
     esbuildPlugins: [
         postCssPlugin({
             plugins: [
@@ -25,6 +22,17 @@ const options = {
 } satisfies BuilderOptions;
 
 const builder = new Builder(options);
+
+Deno.serve(async req => {
+    const url = new URL(req.url);
+    const filepath = decodeURIComponent(url.pathname);
+    const file = await Deno.open(filepath, { read: true });
+    return new Response(file.readable, {
+        "headers": {
+            "Access-Control-Allow-Origin": "*"
+        }
+    });
+}).unref();
 
 await builder.serve();
 

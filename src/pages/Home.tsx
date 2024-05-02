@@ -1,17 +1,17 @@
-import { useEffect, useState } from "preact/hooks";
-import { Fragment, h } from "preact";
+import { h } from "preact";
 import { switcher } from "~/App.tsx";
-import Progress from "~/components/Progress.tsx";
-import Psd from "psd";
+import { parsePsd } from "~/lib/psd.ts";
 
 export default function Home() {
-  const [popup, setPopup] = useState(<></>);
   const onFileSubmit = (files: FileList | null | undefined) => {
     if (!files) return;
     const file = files.item(0);
     if (!file) return;
 
-    setPopup(<LoadingPopup file={file} />);
+    file.arrayBuffer().then((f) => {
+      const psd = parsePsd(f);
+      switcher.switch("viewer", { psd });
+    });
   };
 
   return (
@@ -36,30 +36,11 @@ export default function Home() {
       >
         <input
           type="file"
-          accept=".psd"
+          accept=".psd, .psb"
           onInput={(e) => onFileSubmit(e.currentTarget.files)}
         >
         </input>
         <p>ここにファイルをドロップ</p>
-      </div>
-      {popup}
-    </div>
-  );
-}
-
-function LoadingPopup({ file }: { file: File }) {
-  const [[progress, status], setProgress] = useState([0, ""]);
-  useEffect(() => {
-    (async () => {
-      const f = await file.arrayBuffer();
-      const psd = Psd.parse(f);
-      switcher.switch("viewer", { psd });
-    })();
-  }, []);
-  return (
-    <div class="popup-bg">
-      <div class="w-[50vw] p-2 border bg-slate-200 rounded shadow">
-        <Progress progress={progress} status={status}></Progress>
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import { ComponentChildren, Fragment, h, toChildArray } from "preact";
 
 type Direction = "row" | "column";
 
-const handleSize = 13;
+const handleSize = 9;
 // ハンドルの移動で他のハンドルが移動しないようにしたい。
 // 各Paneのサイズを保持すればよさそう。
 // 初期サイズもうまく調整できるようにしたい。比率で調節できればよい。
@@ -119,13 +119,9 @@ function Handle(
         e.preventDefault();
         props.onPointerDown?.(e);
       }}
-      class="flex justify-center shadow-inner"
+      class="flex justify-center shadow z-10 bg-gray-300"
       style={style}
     >
-      <div
-        class="bg-slate-500 self-stretch pointer-events-none"
-        style={{ flex: "0 1px" }}
-      />
     </div>
   );
 }

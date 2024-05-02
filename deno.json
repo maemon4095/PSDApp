@@ -9,8 +9,7 @@
     "~/": "./src/",
     "preact": "https://esm.sh/preact@10.19.7",
     "preact/hooks": "https://esm.sh/preact@10.19.7/hooks",
-    "@types/file.d.ts": "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.3/plugins/loaderOverride/types/file.d.ts",
-    "psd": "npm:@webtoon/psd"
+    "@loader-types/": "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.3/plugins/loaderOverride/types/"
   },
   "tasks": {
     "dev": "deno run -A build.ts serve",

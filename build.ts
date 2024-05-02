@@ -1,6 +1,6 @@
-import { Builder, BuilderOptions } from "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.0/src/mod.ts";
+import { Builder, BuilderOptions } from "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.3/src/mod.ts";
 import tailwindcss from "npm:tailwindcss";
-import postCssPlugin from "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.0/plugins/postCssPlugin.ts";
+import postCssPlugin from "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.3/plugins/postCssPlugin.ts";
 import tailwindConfig from "./tailwind.config.js";
 
 const mode = Deno.args[0];
@@ -24,10 +24,6 @@ const options = {
     treeShaking: true,
     serve: {
         watch: ["./src"]
-    },
-    loader: {
-        ".wasm": "file",
-        ".png": "file"
     },
     esbuildPlugins: [
         postCssPlugin({
