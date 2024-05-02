@@ -1,13 +1,17 @@
-import { ComponentChildren, Fragment, h } from "preact";
+import { h } from "preact";
 import Header from "~/pages/PSDView/Header.tsx";
 import { CanvasTransform } from "~/pages/PSDView/PSDCanvasArea.tsx";
 import Button from "~/components/Button.tsx";
+import {
+  CanvasLayoutCommand,
+  COMMAND_fit,
+} from "~/pages/PSDView/PSDCanvasPane.tsx";
 
 export default function PSDCanvasProps(
   { transform, setTransform }: {
     transform?: CanvasTransform;
     setTransform: (
-      update: (t: CanvasTransform | undefined) => CanvasTransform | undefined,
+      update: (t: CanvasTransform) => CanvasTransform | CanvasLayoutCommand,
     ) => void;
   },
 ) {
@@ -34,7 +38,7 @@ export default function PSDCanvasProps(
       <Button onClick={() => setTransform((t) => t && { ...t, scale: 1 })}>
         原寸大
       </Button>
-      <Button onClick={() => setTransform(() => undefined)}>
+      <Button onClick={() => setTransform(() => COMMAND_fit)}>
         fit
       </Button>
     </Header>
@@ -64,7 +68,7 @@ function TransformInput(
   };
 
   return (
-    <label class="border inline-block -ml-px pl-1">
+    <label class="border inline-block -ml-px pl-1 min-w-max">
       {label}:&nbsp;
       <input
         type="number"

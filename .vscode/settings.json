@@ -1,14 +1,7 @@
 {
     "deno.enable": true,
-    "deno.enablePaths": [
-        "./artifacts/**/*.d.ts",
-        "./src",
-        "./tests",
-        "."
-    ],
     "deno.disablePaths": [
-        "./crates",
-        "./artifacts"
+        "./dist"
     ],
     "files.associations": {
         "*.css": "tailwindcss"

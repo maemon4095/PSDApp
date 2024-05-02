@@ -1,9 +1,14 @@
 import { h } from "preact";
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { Group, Layer, Psd } from "~/lib/psd.ts";
+import { CanvasTransform } from "~/pages/PSDView/PSDCanvasArea.tsx";
 
 export default function PSDCanvas(
-  { psd, version, scale }: { scale: number; psd: Psd; version: number },
+  { psd, version, transform }: {
+    transform?: CanvasTransform;
+    psd: Psd;
+    version: number;
+  },
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const bufferCanvas = useMemo(() => {
@@ -21,11 +26,13 @@ export default function PSDCanvas(
       canvasContext.clearRect(0, 0, canvas.width, canvas.height);
       canvasContext.drawImage(bufferCanvas, 0, 0);
     })();
-  }, [version]);
+  }, [psd, version]);
 
-  const style = {
-    width: scale * psd.width,
-    height: scale * psd.height,
+  const style = transform && {
+    left: transform.x,
+    top: transform.y,
+    width: transform.scale * psd.width,
+    height: transform.scale * psd.height,
   } satisfies h.JSX.CSSProperties;
 
   return (
@@ -34,6 +41,7 @@ export default function PSDCanvas(
       width={psd.width}
       height={psd.height}
       style={style}
+      class="absolute border shadow-lg border-stone-600"
     />
   );
 }

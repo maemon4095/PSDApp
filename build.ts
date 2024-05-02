@@ -21,7 +21,7 @@ const options = {
     denoConfigPath: "./deno.json",
     outdir: "./dist",
     clearDistDir: true,
-    treeShaking: true,
+    sourceMap: mode !== "build",
     serve: {
         watch: ["./src"]
     },

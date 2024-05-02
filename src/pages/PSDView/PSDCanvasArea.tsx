@@ -1,46 +1,26 @@
 import { h } from "preact";
-import {
-  Dispatch,
-  StateUpdater,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "preact/hooks";
-import { Group, Layer, Psd } from "~/lib/psd.ts";
+import { MutableRef, useState } from "preact/hooks";
+import { Psd } from "~/lib/psd.ts";
 import PSDCanvas from "~/pages/PSDView/PSDCanvas.tsx";
 
 export type CanvasTransform = { scale: number; x: number; y: number };
 
 type Props = {
   psd: Psd;
+  containerRef: MutableRef<HTMLDivElement | null>;
   version: number;
   transform?: CanvasTransform;
   setTransform: (
-    update: (t: undefined | CanvasTransform) => CanvasTransform,
+    update: (t: CanvasTransform) => CanvasTransform,
   ) => void;
 };
 
 const DEFAULT_TRANSFORM = { scale: 0, x: 0, y: 0 } satisfies CanvasTransform;
 
 export default function PSDCanvasArea(
-  { psd, version, transform, setTransform }: Props,
+  { psd, version, transform, containerRef, setTransform }: Props,
 ) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState(false);
-
-  useEffect(() => {
-    if (transform) return;
-    // initial layout; fit canvas and centering
-    const container = containerRef.current!;
-    const containerRect = container.getBoundingClientRect();
-    const scaleW = containerRect.width / psd.width;
-    const scaleH = containerRect.height / psd.height;
-    const scale = Math.min(scaleW, scaleH);
-    const x = (containerRect.width - psd.width * scale) / 2;
-    const y = (containerRect.height - psd.height * scale) / 2;
-    setTransform(() => ({ scale, x, y }));
-  }, [transform]);
 
   return (
     <div
@@ -81,16 +61,11 @@ export default function PSDCanvasArea(
       onPointerLeave={() => setDragging(false)}
       onPointerCancel={() => setDragging(false)}
     >
-      <div
-        style={{ top: transform?.y, left: transform?.x }}
-        class="absolute border shadow-lg border-stone-600"
-      >
-        <PSDCanvas
-          psd={psd}
-          version={version}
-          scale={transform?.scale ?? DEFAULT_TRANSFORM.scale}
-        />
-      </div>
+      <PSDCanvas
+        psd={psd}
+        version={version}
+        transform={transform}
+      />
     </div>
   );
 }

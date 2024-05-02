@@ -18,7 +18,7 @@ export default function PSDView({ psd }: { psd: Psd }) {
   };
 
   return (
-    <div class="size-full overflow-hidden grid grid-t-rows-[1fr_auto]">
+    <div class="size-full overflow-hidden grid grid-t-rows-[1fr]">
       <Partitioned firstSize={300} direction="row">
         <div class="grid grid-t-rows-[auto_1fr] overflow-hidden">
           <Header>
@@ -30,7 +30,6 @@ export default function PSDView({ psd }: { psd: Psd }) {
         </div>
         <CanvasPane psd={psd} version={version} />
       </Partitioned>
-      <div class="bg-gray-300 h-2"></div>
     </div>
   );
 }

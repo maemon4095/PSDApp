@@ -2,6 +2,7 @@ import * as psd from "npm:@webtoon/psd";
 import RawPSD from "npm:@webtoon/psd";
 
 export type Psd = {
+    readonly name: string;
     readonly width: number;
     readonly height: number;
     readonly layers: Layer[];
@@ -30,8 +31,8 @@ export type Group = {
     visible: boolean;
 };
 
-export function parsePsd(buffer: ArrayBuffer): Psd {
-    const psd = RawPSD.parse(buffer);
+export async function parsePsd(file: File): Promise<Psd> {
+    const psd = RawPSD.parse(await file.arrayBuffer());
     const width = psd.width;
     const height = psd.height;
     const layers: Layer[] = [];
@@ -45,7 +46,8 @@ export function parsePsd(buffer: ArrayBuffer): Psd {
         height,
         children,
         layers,
-        groups
+        groups,
+        name: file.name
     };
 }
 
