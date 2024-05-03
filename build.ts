@@ -17,7 +17,7 @@ switch (mode) {
 }
 
 const options = {
-    documentFilePath: "./src/index.html",
+    documentFilePath: "./index.html",
     denoConfigPath: "./deno.json",
     outdir: "./dist",
     clearDistDir: true,
