@@ -31,6 +31,14 @@ input:invalid {
     @apply bg-red-300;
 }
 
+h1 {
+    @apply text-2xl font-bold
+}
+
+h3 {
+    @apply text-xl font-bold
+}
+
 @layer utilities {
     .popup-bg {
         position: fixed;
@@ -65,5 +73,9 @@ input:invalid {
 
     .trigger {
        @apply min-w-max hover:shadow active:shadow-inner bg-slate-200 rounded border 
+    }
+
+    .link {
+        @apply text-blue-500
     }
 }

@@ -2,10 +2,11 @@ import { h } from "preact";
 import { useContext } from "preact/hooks";
 import { switcher } from "~/App.tsx";
 import { parsePsd } from "~/lib/psd.ts";
-import { PopUp } from "~/layout/default.tsx";
+import { DefaultLayoutContext } from "~/layout/default.tsx";
+import Credits from "~/pages/Home/Credits.tsx";
 
 export default function Home() {
-  const setPopup = useContext(PopUp);
+  const context = useContext(DefaultLayoutContext);
 
   const onFileSubmit = (files: FileList | null | undefined) => {
     if (!files) return;
@@ -17,9 +18,11 @@ export default function Home() {
   };
 
   return (
-    <div class="h-full w-full md:max-w-screen-md m-auto p-1 flex flex-col">
-      <div></div>
-      <div class="child-center flex-1">
+    <div class="h-full w-full md:max-w-screen-md m-auto gap-4 p-4 flex flex-col items-stretch">
+      <div>
+        <h1>PSDApp</h1>
+      </div>
+      <div class="flex-1 flex flex-col justify-center">
         <div
           onDragOver={(e) => {
             e.preventDefault();
@@ -36,7 +39,7 @@ export default function Home() {
             e.preventDefault();
             onFileSubmit(e.dataTransfer?.files);
           }}
-          class="flex flex-col"
+          class="flex flex-col gap-1 p-4 rounded border bg-slate-100"
         >
           <input
             type="file"
@@ -47,13 +50,13 @@ export default function Home() {
           <p>ここにファイルをドロップ</p>
         </div>
       </div>
-      <footer>
+      <footer class="border shadow-inner rounded p-1 px-2 flex flex-row justify-center">
         <button
           onClick={() => {
-            setPopup(<span>yo</span>, (e) => {
+            context.setPopup(<Credits />, (e) => {
             });
           }}
-          class="text-blue-500"
+          class="link"
         >
           credit
         </button>

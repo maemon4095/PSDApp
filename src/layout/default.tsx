@@ -1,16 +1,22 @@
-import { ComponentChild, ComponentChildren, createContext, h } from "preact";
-import { useState } from "preact/hooks";
+import {
+  ComponentChild,
+  ComponentChildren,
+  createContext,
+  Fragment,
+  h,
+} from "preact";
+import { useMemo, useState } from "preact/hooks";
 
-type RegisterPopup = (
-  popup: ComponentChild,
-  handler?: PopupEventHandler,
-) => void;
 type PopupEvent = PopUpCancelEvent;
-type PopupEventHandler = (e: PopupEvent) => void;
+type PopupEventListener = (e: PopupEvent) => void;
 
-export const PopUp = createContext(
-  (() => {}) as RegisterPopup,
+export const DefaultLayoutContext = createContext(
+  undefined as unknown as DefaultLayoutContext,
 );
+
+export type DefaultLayoutContext = {
+  setPopup(popup: ComponentChild, listener?: PopupEventListener): void;
+};
 
 export class PopUpCancelEvent extends Event {
   static override readonly name = "cancel";
@@ -22,36 +28,44 @@ export class PopUpCancelEvent extends Event {
 }
 
 export default function Layout({ children }: { children: ComponentChildren }) {
-  const [popupPair, setPopup] = useState(
-    undefined as undefined | [ComponentChild, PopupEventHandler | undefined],
+  const [popupPair, setPopupPair] = useState(
+    undefined as undefined | [ComponentChild, PopupEventListener | undefined],
   );
 
+  const context: DefaultLayoutContext = useMemo(() => {
+    return {
+      setPopup(popup, listener) {
+        setPopupPair([popup, listener]);
+      },
+    };
+  }, []);
+
   const popup = popupPair && popupPair[0];
-  const handler = popupPair && popupPair[1];
+  const listener = popupPair && popupPair[1];
 
   return (
-    <PopUp.Provider value={(e, h) => setPopup([e, h])}>
+    <DefaultLayoutContext.Provider value={context}>
       <div class="size-full">
         {children}
-        {popup != undefined
-          ? (
-            <Popup handler={handler} onClose={() => setPopup(undefined)}>
-              {popup}
-            </Popup>
-          )
-          : undefined}
+        <Popup handler={listener} onClose={() => setPopupPair(undefined)}>
+          {popup}
+        </Popup>
       </div>
-    </PopUp.Provider>
+    </DefaultLayoutContext.Provider>
   );
 }
 
 function Popup(
   { children, handler, onClose }: {
-    children: ComponentChild;
-    handler?: PopupEventHandler;
+    children?: ComponentChild;
+    handler?: PopupEventListener;
     onClose: () => void;
   },
 ) {
+  if (children === undefined) {
+    return <></>;
+  }
+
   return (
     <div
       onClick={(e) => {
