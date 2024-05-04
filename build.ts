@@ -2,6 +2,8 @@ import { Builder, BuilderOptions } from "https://raw.githubusercontent.com/maemo
 import tailwindcss from "npm:tailwindcss";
 import postCssPlugin from "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.3/plugins/postCssPlugin.ts";
 import tailwindConfig from "./tailwind.config.js";
+import * as path from "https://deno.land/std@0.224.0/path/mod.ts";
+import { writableStreamFromWriter } from "https://deno.land/std@0.140.0/streams/conversion.ts";
 
 const mode = Deno.args[0];
 switch (mode) {
@@ -30,7 +32,18 @@ const options = {
             plugins: [
                 tailwindcss(tailwindConfig)
             ]
-        })
+        }),
+
+        {
+            name: "clone service worker",
+            setup(build) {
+                build.onEnd(async () => {
+                    const outdir = build.initialOptions.outdir!;
+                    const serviceWorkerPath = "./src-worker/worker.js";
+                    await Deno.copyFile(serviceWorkerPath, path.join(outdir, path.basename(serviceWorkerPath)));
+                });
+            }
+        }
     ]
 } satisfies BuilderOptions;
 const builder = new Builder(options);

@@ -5,10 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PSDApp</title>
-    <link rel="manifest" href="/public/manifest.json" data-esbuilder-static />
-    <link rel="shortcut icon" href="/public/icon.svg" data-esbuilder-static />
+    <link rel="manifest" href="/manifest.webmanifest" data-esbuilder-static>
+    <link rel="shortcut icon" href="/public/icon.svg" data-esbuilder-static>
     <script type="module" src="src/index.tsx" data-esbuilder-bundle></script>
     <link href="src/index.css" rel="stylesheet" data-esbuilder-bundle>
+
+    <script defer>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/worker.js', { scope: '/' });
+        }
+    </script>
 </head>
 
 <body>
