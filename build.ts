@@ -23,6 +23,7 @@ const options = {
     outdir: "./dist",
     clearDistDir: true,
     sourceMap: mode !== "build",
+    dropLabels: mode === "build" ? ["DEV"] : undefined,
     serve: {
         watch: ["./src"]
     },
