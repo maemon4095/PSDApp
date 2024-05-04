@@ -7,7 +7,7 @@
 - [Deno](https://deno.com)
 
 # ライセンス
-MIT
+[MIT](./LICENSE)
 
 # クレジット
 ### [Deno](https://deno.com)
