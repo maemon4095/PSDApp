@@ -3,7 +3,7 @@
 [PSDTool](https://oov.github.io/psdtool/)に影響を受けて作成しています。
 
 
-# 必要なもの
+# ビルドに必要なもの
 - [Deno](https://deno.com)
 
 # ライセンス
