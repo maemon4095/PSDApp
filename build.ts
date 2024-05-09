@@ -25,7 +25,7 @@ const options = {
     sourceMap: mode !== "build",
     dropLabels: mode === "build" ? ["DEV"] : undefined,
     serve: {
-        watch: ["./src"]
+        watch: ["./src", "./src-worker"]
     },
     esbuildPlugins: [
         postCssPlugin({
