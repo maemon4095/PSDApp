@@ -8,7 +8,7 @@ self.addEventListener('install', event => {
             './src/index.js',
             './src/index.css',
             './public/icon.svg',
-            './public/manifest.json'
+            './manifest.webmanifest'
         ]);
     })());
 });
@@ -16,16 +16,17 @@ self.addEventListener('install', event => {
 self.addEventListener('fetch', event => {
     event.respondWith((async () => {
         const cache = await caches.open(CACHE_NAME);
-
         const cachedResponse = await cache.match(event.request);
+
         if (cachedResponse) {
             return cachedResponse;
         } else {
             try {
                 const fetchResponse = await fetch(event.request);
-                cache.put(event.request, fetchResponse.clone());
+                await cache.put(event.request, fetchResponse.clone());
                 return fetchResponse;
-            } catch {
+            } catch (e) {
+                console.log("worker fetch error:", e);
                 return Response.error()
             }
         }
