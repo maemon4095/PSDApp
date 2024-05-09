@@ -3,7 +3,7 @@
   "lang": "ja-JP",
   "name": "PSDApp",
   "short_name": "PSDApp",
-  "scope": "/",
+  "scope": ".",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#fff",

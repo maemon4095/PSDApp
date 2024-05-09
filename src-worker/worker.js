@@ -4,11 +4,11 @@ self.addEventListener('install', event => {
     event.waitUntil((async () => {
         const cache = await caches.open(CACHE_NAME);
         cache.addAll([
-            '/',
-            '/src/index.js',
-            '/src/index.css',
-            '/public/icon.svg',
-            '/public/manifest.json'
+            '.',
+            './src/index.js',
+            './src/index.css',
+            './public/icon.svg',
+            './public/manifest.json'
         ]);
     })());
 });
