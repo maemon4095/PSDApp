@@ -1,6 +1,6 @@
-import { Builder, BuilderOptions } from "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.3/src/mod.ts";
+import { Builder, BuilderOptions } from "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.4/src/mod.ts";
 import tailwindcss from "npm:tailwindcss";
-import postCssPlugin from "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.3/plugins/postCssPlugin.ts";
+import postCssPlugin from "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.4/plugins/postCssPlugin.ts";
 import tailwindConfig from "./tailwind.config.js";
 import * as path from "https://deno.land/std@0.224.0/path/mod.ts";
 
