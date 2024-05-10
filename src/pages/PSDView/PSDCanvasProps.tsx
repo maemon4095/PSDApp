@@ -3,16 +3,14 @@ import Header from "~/pages/PSDView/Header.tsx";
 import { CanvasTransform } from "~/pages/PSDView/PSDCanvasArea.tsx";
 import Button from "~/components/Button.tsx";
 import {
-  CanvasLayoutCommand,
-  COMMAND_fit,
+  CanvasTransformDispatch,
+  commandFit,
 } from "~/pages/PSDView/PSDCanvasPane.tsx";
 
 export default function PSDCanvasProps(
   { transform, setTransform }: {
     transform?: CanvasTransform;
-    setTransform: (
-      update: (t: CanvasTransform) => CanvasTransform | CanvasLayoutCommand,
-    ) => void;
+    setTransform: CanvasTransformDispatch;
   },
 ) {
   return (
@@ -21,24 +19,24 @@ export default function PSDCanvasProps(
         <TransformInput
           label="x"
           value={transform?.x}
-          onInput={(x) => setTransform((t) => t && { ...t, x })}
+          onInput={(x) => setTransform({ x })}
         />
         <TransformInput
           label="y"
           value={transform?.y}
-          onInput={(y) => setTransform((t) => t && { ...t, y })}
+          onInput={(y) => setTransform({ y })}
         />
         <TransformInput
           label="scale"
           value={transform?.scale.toFixed(2)}
           step={0.01}
-          onInput={(scale) => setTransform((t) => t && { ...t, scale })}
+          onInput={(scale) => setTransform({ scale })}
         />
       </div>
-      <Button onClick={() => setTransform((t) => t && { ...t, scale: 1 })}>
+      <Button onClick={() => setTransform({ scale: 1 })}>
         原寸大
       </Button>
-      <Button onClick={() => setTransform(() => COMMAND_fit)}>
+      <Button onClick={() => setTransform(commandFit)}>
         fit
       </Button>
     </Header>

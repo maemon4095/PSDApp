@@ -1,42 +1,48 @@
 import { h } from "preact";
-import { useEffect, useRef, useState } from "preact/hooks";
+import { Dispatch, useEffect, useReducer, useRef } from "preact/hooks";
 import { parsePsd, Psd } from "~/lib/psd.ts";
 import PSDCanvasArea, {
   CanvasTransform,
 } from "~/pages/PSDView/PSDCanvasArea.tsx";
 import PSDCanvasProps from "~/pages/PSDView/PSDCanvasProps.tsx";
-import { mapState } from "~/lib/utils/mod.ts";
 import Button from "~/components/Button.tsx";
 import { switcher } from "~/App.tsx";
 import TriggerInput from "~/components/TriggerInput.tsx";
 
-export const COMMAND_reset = 0;
-export const COMMAND_fit = 1;
-export type CanvasLayoutCommand = typeof COMMAND_reset | typeof COMMAND_fit;
+export const commandReset = Symbol();
+export const commandFit = Symbol();
+export type CanvasTransformCommand = typeof commandReset | typeof commandFit;
+export type CanvasTransformAction =
+  | Partial<CanvasTransform>
+  | CanvasTransformCommand
+  | ((t: CanvasTransform) => Partial<CanvasTransform>);
+export type CanvasTransformDispatch = Dispatch<CanvasTransformAction>;
 
 export default function CanvasPane(
   { psd, version }: { version: number; psd: Psd },
 ) {
-  const [transform, rawSetTransform] = useState(
-    { scale: 1, x: 0, y: 0 },
-  );
-  const canvasAreaRef = useRef<HTMLDivElement>(null);
-
-  const setTransform = mapState(
-    rawSetTransform,
-    (t: CanvasTransform | CanvasLayoutCommand) => {
-      if (t === COMMAND_reset) {
+  const [transform, setTransform] = useReducer<
+    CanvasTransform,
+    CanvasTransformAction
+  >(
+    (old, action) => {
+      if (action === commandReset) {
         return { scale: 1, x: 0, y: 0 };
       }
-      if (t === COMMAND_fit) {
+      if (action === commandFit) {
         return fitCanvas();
       }
-
-      t.x = Math.floor(t.x);
-      t.y = Math.floor(t.y);
-      return t;
+      const t = action instanceof Function ? action(old) : action;
+      const u = { ...old, ...t };
+      u.x = Math.floor(u.x);
+      u.y = Math.floor(u.y);
+      return u;
     },
+    { scale: 1, x: 0, y: 0 },
   );
+
+  const canvasAreaRef = useRef<HTMLDivElement>(null);
+
   function fitCanvas() {
     const container = canvasAreaRef.current!;
     const containerRect = container.getBoundingClientRect();
@@ -49,7 +55,7 @@ export default function CanvasPane(
   }
 
   useEffect(() => {
-    setTransform(COMMAND_fit);
+    setTransform(commandFit);
   }, [psd]);
 
   return (
