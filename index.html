@@ -9,12 +9,6 @@
     <link rel="shortcut icon" href="public/icon.svg" data-esbuilder-static>
     <script type="module" src="src/index.tsx" data-esbuilder-bundle></script>
     <link href="src/index.css" rel="stylesheet" data-esbuilder-bundle>
-
-    <script defer>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./worker.js', { scope: '.' });
-        }
-    </script>
 </head>
 
 <body>

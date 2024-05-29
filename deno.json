@@ -7,9 +7,11 @@
   },
   "imports": {
     "~/": "./src/",
-    "preact": "https://esm.sh/preact@10.19.7",
-    "preact/hooks": "https://esm.sh/preact@10.19.7/hooks",
-    "@loader-types/": "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.3/plugins/loaderOverride/types/"
+    "preact": "npm:preact",
+    "preact/hooks": "npm:preact/hooks",
+    "@loader-types/": "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.3/plugins/loaderOverride/types/",
+    "psd": "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.1.0/src/mod.ts",
+    "$GENERATED_FILES": "./src/types/generatedFiles.d.ts"
   },
   "tasks": {
     "dev": "deno run -A build.ts serve",

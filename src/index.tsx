@@ -1,5 +1,7 @@
 import { h, render } from "preact";
 import App from "./App.tsx";
+// @deno-types=@loader-types/file.d.ts
+import worker from "./service.worker.ts";
 
 // deno-lint-ignore no-unused-labels
 DEV: {
@@ -22,6 +24,10 @@ DEV: {
 
     location.reload();
   });
+}
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register(worker, { scope: "." });
 }
 
 render(

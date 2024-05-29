@@ -1,6 +1,6 @@
 import { Builder, BuilderOptions } from "file:///C:/Users/maemon/repos/deno-esbuilder/src/mod.ts";
 import tailwindcss from "npm:tailwindcss";
-import postCssPlugin from "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.3/plugins/postCssPlugin.ts";
+import postCssPlugin from "file:///C:/Users/maemon/repos/deno-esbuilder/plugins/postCssPlugin.ts";
 import tailwindConfig from "../tailwind.preview.config.js";
 
 const options = {
@@ -9,6 +9,7 @@ const options = {
     outdir: resolve("./dist"),
     clearDistDir: true,
     treeShaking: true,
+    sourceMap: true,
     serve: {
         watch: [resolve("../src"), resolve("./src")]
     },

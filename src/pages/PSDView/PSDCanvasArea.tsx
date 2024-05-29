@@ -22,7 +22,7 @@ export default function PSDCanvasArea(
   return (
     <div
       ref={containerRef}
-      class="overflow-hidden translate-x-0 bg-slate-200"
+      class="overflow-hidden translate-x-0 bg-slate-200 bg-blank"
       onWheel={(e) => {
         const sign = Math.sign(-e.deltaY);
         const containerRect = containerRef.current!.getBoundingClientRect();

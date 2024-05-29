@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useContext } from "preact/hooks";
 import { switcher } from "~/App.tsx";
-import { parsePsd } from "~/lib/psd.ts";
+import { parse } from "~/lib/psd.ts";
 import { DefaultLayoutContext } from "~/layout/default.tsx";
 import Credits from "~/pages/Home/Credits.tsx";
 
@@ -12,8 +12,10 @@ export default function Home() {
     if (!files) return;
     const file = files.item(0);
     if (!file) return;
-    parsePsd(file).then((psd) => {
-      switcher.switch("viewer", { psd });
+
+    file.arrayBuffer().then(async (raw) => {
+      const psd = await parse(raw);
+      switcher.switch("viewer", { psd, filename: file.name });
     });
   };
 

@@ -1,12 +1,15 @@
+import files from "$GENERATED_FILES";
+import { unsafeAssertType } from "~/lib/utils/mod.ts";
+
 const CACHE_NAME = `PSDApp-v0.0.0`;
 
-self.addEventListener('install', event => {
+self.addEventListener('install', (event) => {
+    unsafeAssertType<ExtendableEvent>(event);
     event.waitUntil((async () => {
         const cache = await caches.open(CACHE_NAME);
         cache.addAll([
+            ...files,
             '.',
-            './src/index.js',
-            './src/index.css',
             './public/icon.svg',
             './manifest.webmanifest'
         ]);
@@ -14,6 +17,7 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
+    unsafeAssertType<FetchEvent>(event);
     event.respondWith((async () => {
         const cache = await caches.open(CACHE_NAME);
         const cachedResponse = await cache.match(event.request);
@@ -27,8 +31,23 @@ self.addEventListener('fetch', event => {
                 return fetchResponse;
             } catch (e) {
                 console.log("worker fetch error:", e);
-                return Response.error()
+                return Response.error();
             }
         }
     })());
 });
+
+
+type ExtendableEvent = Event & {
+    waitUntil(promise: Promise<unknown>): void;
+};
+
+type FetchEvent = ExtendableEvent & {
+    readonly clientId: string;
+    readonly handled: Promise<void>;
+    readonly preloadResponse: Promise<Response | undefined>;
+    readonly replacesClientId: string;
+    readonly resultingClientId: string;
+    readonly request: Request;
+    respondWith(response: Response | Promise<Response>): void;
+};

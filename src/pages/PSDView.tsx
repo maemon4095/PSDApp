@@ -6,7 +6,9 @@ import { Psd } from "~/lib/psd.ts";
 import Header from "~/pages/PSDView/Header.tsx";
 import CanvasPane from "~/pages/PSDView/PSDCanvasPane.tsx";
 
-export default function PSDView({ psd }: { psd: Psd }) {
+export default function PSDView(
+  { psd, filename }: { psd: Psd; filename: string },
+) {
   const [version, setVersion] = useState(0);
   const onChange = () => {
     setVersion((v) => {
@@ -25,10 +27,10 @@ export default function PSDView({ psd }: { psd: Psd }) {
             レイヤー
           </Header>
           <div class="overflow-auto">
-            <PsdStrucutureView roots={psd.children} onChange={onChange} />
+            <PsdStrucutureView psd={psd} onChange={onChange} />
           </div>
         </div>
-        <CanvasPane psd={psd} version={version} />
+        <CanvasPane psd={psd} filename={filename} version={version} />
       </Partitioned>
     </div>
   );

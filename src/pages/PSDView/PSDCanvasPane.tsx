@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { Dispatch, useEffect, useReducer, useRef } from "preact/hooks";
-import { parsePsd, Psd } from "~/lib/psd.ts";
+import { parse, Psd } from "~/lib/psd.ts";
 import PSDCanvasArea, {
   CanvasTransform,
 } from "~/pages/PSDView/PSDCanvasArea.tsx";
@@ -19,7 +19,7 @@ export type CanvasTransformAction =
 export type CanvasTransformDispatch = Dispatch<CanvasTransformAction>;
 
 export default function CanvasPane(
-  { psd, version }: { version: number; psd: Psd },
+  { filename, version, psd }: { filename: string; version: number; psd: Psd },
 ) {
   const [transform, setTransform] = useReducer<
     CanvasTransform,
@@ -76,14 +76,15 @@ export default function CanvasPane(
           onInput={(e) => {
             const file = e.currentTarget.files?.[0];
             if (!file) return;
-            parsePsd(file).then((psd) => {
-              switcher.switch("viewer", { psd });
+            file.arrayBuffer().then(async (raw) => {
+              const psd = await parse(raw);
+              switcher.switch("viewer", { psd, filename: file.name });
             });
           }}
         >
           📂
         </TriggerInput>
-        <span class="ml-auto">{psd.name}@{psd.width}x{psd.height}</span>
+        <span class="ml-auto">{filename}@{psd.width}x{psd.height}</span>
       </div>
     </div>
   );
