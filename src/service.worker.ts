@@ -1,7 +1,7 @@
 import files from "$GENERATED_FILES";
 import { unsafeAssertType } from "~/lib/utils/mod.ts";
 
-const CACHE_NAME = `PSDApp-v0.0.0`;
+const CACHE_NAME = `PSDApp-v0.1.0`;
 
 self.addEventListener('install', (event) => {
     unsafeAssertType<ExtendableEvent>(event);

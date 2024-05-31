@@ -60,7 +60,7 @@ function Popup(
     onClose: () => void;
   },
 ) {
-  if (children === undefined) {
+  if (children === undefined || children === null) {
     return <></>;
   }
 
@@ -73,7 +73,7 @@ function Popup(
         if (event.defaultPrevented) return;
         onClose();
       }}
-      class="fixed top-0 left-0 size-full z-50 backdrop-blur backdrop-brightness-90 child-center"
+      class="fixed top-0 left-0 size-full z-50 backdrop-blur child-center backdrop-brightness-95"
     >
       {children}
     </div>

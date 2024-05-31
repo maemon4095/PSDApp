@@ -1,5 +1,5 @@
-import Home from "~/pages/Home.tsx";
-import PSDView from "~/pages/PSDView.tsx";
+import Home from "~/pages/Home/mod.tsx";
+import PSDView from "~/pages/PSDView/mod.tsx";
 import { createSwitcher } from "jsr:@maemon4095/preact-switcher";
 import Layout from "~/layout/default.tsx";
 

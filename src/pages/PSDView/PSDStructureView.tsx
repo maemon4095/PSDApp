@@ -32,7 +32,7 @@ function Entry(
 
 function LayerEntry({ layer, onChange }: { layer: Layer } & Callbacks) {
   const [visible, toggleVisible] = useReducer(
-    (old: boolean, e: void): boolean => {
+    (old: boolean, _: void): boolean => {
       layer.visible = !old;
       onChange?.();
       return !old;
@@ -69,7 +69,7 @@ function LayerEntry({ layer, onChange }: { layer: Layer } & Callbacks) {
 function GroupEntry({ group, onChange }: { group: Group } & Callbacks) {
   const [collapsed, setCollapsed] = useState(!group.visible);
   const [visible, toggleVisible] = useReducer(
-    (old: boolean, e: void): boolean => {
+    (old: boolean, _: void): boolean => {
       group.visible = !old;
       onChange?.();
       return !old;

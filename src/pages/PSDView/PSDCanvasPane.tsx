@@ -1,4 +1,10 @@
-import { type Dispatch, useEffect, useReducer, useRef } from "preact/hooks";
+import {
+  type Dispatch,
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+} from "preact/hooks";
 import { parse, type Psd } from "~/lib/psd.ts";
 import PSDCanvasArea, {
   type CanvasTransform,
@@ -7,6 +13,8 @@ import PSDCanvasProps from "~/pages/PSDView/PSDCanvasProps.tsx";
 import Button from "~/components/Button.tsx";
 import { switcher } from "~/App.tsx";
 import TriggerInput from "~/components/TriggerInput.tsx";
+import { DefaultLayoutContext } from "~/layout/default.tsx";
+import Loading from "~/components/Loading.tsx";
 
 export const commandReset = Symbol();
 export const commandFit = Symbol();
@@ -20,6 +28,7 @@ export type CanvasTransformDispatch = Dispatch<CanvasTransformAction>;
 export default function CanvasPane(
   { filename, version, psd }: { filename: string; version: number; psd: Psd },
 ) {
+  const context = useContext(DefaultLayoutContext);
   const [transform, setTransform] = useReducer<
     CanvasTransform,
     CanvasTransformAction
@@ -75,8 +84,10 @@ export default function CanvasPane(
           onInput={(e) => {
             const file = e.currentTarget.files?.[0];
             if (!file) return;
+            context.setPopup(<Loading name={file.name} />);
             file.arrayBuffer().then(async (raw) => {
               const psd = await parse(raw);
+              context.setPopup(null);
               switcher.switch("viewer", { psd, filename: file.name });
             });
           }}
