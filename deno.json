@@ -7,7 +7,6 @@
   },
   "lint": {
     "rules": {
-      "tags": ["warning"],
       "include": ["verbatim-module-syntax"]
     }
   },
