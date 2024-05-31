@@ -25,13 +25,13 @@ const distdir = path.join(import.meta.dirname!, "./dist");
 const configPath = path.join(import.meta.dirname!, "./deno.json");
 const context = await esbuild.context({
     entryPoints: ["./src/index.tsx", "./src/index.css"],
+    metafile: true,
     bundle: true,
     format: "esm",
     platform: "browser",
     jsx: "automatic",
     jsxImportSource: "preact",
     assetNames: "[name]",
-    write: false,
     outdir: distdir,
     sourcemap: mode !== "build",
     loader: { ".d.ts": "empty" },
@@ -48,8 +48,6 @@ const context = await esbuild.context({
                 tailwindcss(tailwindConfig)
             ]
         }),
-        generatedFilesPlugin(),
-        generatedFilesReplacePlugin(),
         generateIndexFile({
             staticFiles: [
                 { path: "./public/icon.svg", link: linking.link({ rel: "shortcut icon" }) },
@@ -57,7 +55,6 @@ const context = await esbuild.context({
                 ...(mode === "build" ? [] : [{ path: "./public/hotreload.js", link: linking.script({}) }])
             ],
         }),
-        emitFilesPlugin(),
         ...denoPlugins({ configPath: configPath }),
     ]
 });
@@ -77,64 +74,7 @@ switch (mode) {
     }
 }
 
-function generatedFilesPlugin(): esbuild.Plugin {
-    return {
-        name: "generated-files-plugin",
-        setup(build) {
-            build.initialOptions.metafile = true;
-            build.initialOptions.write = false;
-            const REPLACEMENT_STRING = `["GENERATED_FILES_REPLACEMENT"]`;
 
-            build.onResolve({ filter: /^\$GENERATED_FILES$/ }, (args) => {
-                return {
-                    path: args.importer, namespace: "generated-files-plugin"
-                };
-            });
-
-            build.onLoad({ filter: /.*/, namespace: "generated-files-plugin" }, () => {
-                return { contents: `export default ${REPLACEMENT_STRING};` };
-            });
-        }
-    };
-}
-
-function generatedFilesReplacePlugin(): esbuild.Plugin {
-    return {
-        name: "generated-files-replace-plugin",
-        setup(build) {
-            const REPLACEMENT_STRING = `["GENERATED_FILES_REPLACEMENT"]`;
-
-            build.onEnd(args => {
-                const outputs = args.metafile!.outputs;
-                const localPaths = Object.keys(outputs).map(p => path.relative(build.initialOptions.outdir!, p));
-                const replacement = JSON.stringify(localPaths);
-
-                for (const file of args.outputFiles!) {
-                    const replaced = file.text.replaceAll(REPLACEMENT_STRING, replacement);
-                    if (file.text === replaced) {
-                        continue;
-                    }
-                    file.contents = new TextEncoder().encode(replaced);
-                }
-            });
-        }
-    };
-}
-
-function emitFilesPlugin(): esbuild.Plugin {
-    return {
-        name: "emit-file",
-        setup(build) {
-            build.onEnd(async args => {
-                const outputFiles = args.outputFiles!;
-                for (const file of outputFiles) {
-                    await Deno.mkdir(path.dirname(file.path), { recursive: true });
-                    await Deno.writeFile(file.path, file.contents);
-                }
-            });
-        }
-    };
-}
 
 function cleanOutdir(): esbuild.Plugin {
     return {

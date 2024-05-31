@@ -1,4 +1,3 @@
-import files from "$GENERATED_FILES";
 import { unsafeAssertType } from "~/lib/utils/mod.ts";
 
 const CACHE_NAME = `PSDApp-v0.1.0`;
@@ -8,9 +7,11 @@ self.addEventListener('install', (event) => {
     event.waitUntil((async () => {
         const cache = await caches.open(CACHE_NAME);
         cache.addAll([
-            ...files,
             '.',
-            './public/icon.svg',
+            './index.css',
+            './index.js',
+            './psd.worker.js',
+            './icon.svg',
             './manifest.webmanifest'
         ]);
     })());
