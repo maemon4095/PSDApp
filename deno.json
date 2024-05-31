@@ -15,7 +15,7 @@
     "preact": "npm:preact",
     "preact/hooks": "npm:preact/hooks",
     "@loader-types/": "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.3/plugins/loaderOverride/types/",
-    "psd": "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.1.0/src/mod.ts",
+    "psd/": "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/",
     "$GENERATED_FILES": "./src/types/generatedFiles.d.ts"
   },
   "tasks": {

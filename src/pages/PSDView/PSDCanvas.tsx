@@ -1,6 +1,6 @@
 import type { JSX } from "preact";
-import { useEffect, useRef } from "preact/hooks";
-import { type Psd, render } from "~/lib/psd.ts";
+import { useEffect, useMemo, useRef } from "preact/hooks";
+import { createRenderer, type Psd } from "~/lib/psd.ts";
 import type { CanvasTransform } from "~/pages/PSDView/PSDCanvasArea.tsx";
 
 export default function PSDCanvas(
@@ -11,10 +11,11 @@ export default function PSDCanvas(
   },
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const renderer = useMemo(() => createRenderer(psd.width, psd.height), [psd]);
 
   useEffect(() => {
     console.log("render");
-    const image = render(psd);
+    const image = renderer.render(psd, 0, 0);
     const canvas = canvasRef.current!;
     const canvasContext = canvas.getContext("2d")!;
     canvasContext.putImageData(image, 0, 0);
