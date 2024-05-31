@@ -1,9 +1,9 @@
-import { h } from "preact";
+import type { h } from "preact";
 import Header from "~/pages/PSDView/Header.tsx";
-import { CanvasTransform } from "~/pages/PSDView/PSDCanvasArea.tsx";
+import type { CanvasTransform } from "~/pages/PSDView/PSDCanvasArea.tsx";
 import Button from "~/components/Button.tsx";
 import {
-  CanvasTransformDispatch,
+  type CanvasTransformDispatch,
   commandFit,
 } from "~/pages/PSDView/PSDCanvasPane.tsx";
 

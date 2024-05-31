@@ -1,8 +1,8 @@
-import { h } from "preact";
-import { MutableRef, useState } from "preact/hooks";
-import { Psd } from "~/lib/psd.ts";
+import type { h } from "preact";
+import { type MutableRef, useState } from "preact/hooks";
+import type { Psd } from "~/lib/psd.ts";
 import PSDCanvas from "~/pages/PSDView/PSDCanvas.tsx";
-import { CanvasTransformDispatch } from "~/pages/PSDView/PSDCanvasPane.tsx";
+import type { CanvasTransformDispatch } from "~/pages/PSDView/PSDCanvasPane.tsx";
 
 export type CanvasTransform = { scale: number; x: number; y: number };
 

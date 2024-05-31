@@ -1,4 +1,3 @@
-import { h } from "preact";
 import Home from "~/pages/Home.tsx";
 import PSDView from "~/pages/PSDView.tsx";
 import { createSwitcher } from "jsr:@maemon4095/preact-switcher";

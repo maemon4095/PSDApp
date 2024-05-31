@@ -1,7 +1,7 @@
-import { h } from "preact";
-import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { Group, Layer, Psd, render } from "~/lib/psd.ts";
-import { CanvasTransform } from "~/pages/PSDView/PSDCanvasArea.tsx";
+import type { JSX } from "preact";
+import { useEffect, useRef } from "preact/hooks";
+import { type Psd, render } from "~/lib/psd.ts";
+import type { CanvasTransform } from "~/pages/PSDView/PSDCanvasArea.tsx";
 
 export default function PSDCanvas(
   { psd, version, transform }: {
@@ -25,7 +25,7 @@ export default function PSDCanvas(
     top: transform.y,
     width: transform.scale * psd.width,
     height: transform.scale * psd.height,
-  } satisfies h.JSX.CSSProperties;
+  } satisfies JSX.CSSProperties;
 
   return (
     <canvas

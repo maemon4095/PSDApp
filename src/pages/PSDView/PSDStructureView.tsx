@@ -1,6 +1,6 @@
-import { ComponentChildren, Fragment, h } from "preact";
-import { useMemo, useReducer, useState } from "preact/hooks";
-import { Group, Layer, Psd } from "~/lib/psd.ts";
+import type { ComponentChildren, Fragment, h } from "preact";
+import { type useMemo, useReducer, useState } from "preact/hooks";
+import type { Group, Layer, Psd } from "~/lib/psd.ts";
 
 type Callbacks = {
   onChange: () => void;

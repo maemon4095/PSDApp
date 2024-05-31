@@ -1,9 +1,13 @@
-import { Builder, BuilderOptions } from "file:///C:/Users/maemon/repos/deno-esbuilder/src/mod.ts";
 import tailwindcss from "npm:tailwindcss";
-import postCssPlugin from "file:///C:/Users/maemon/repos/deno-esbuilder/plugins/postCssPlugin.ts";
 import tailwindConfig from "./tailwind.config.js";
-import * as path from "https://deno.land/std@0.224.0/path/mod.ts";
-import * as esbuild from "https://deno.land/x/esbuild@v0.21.2/mod.js";
+import * as path from "jsr:@std/path";
+import * as esbuild from "npm:esbuild";
+import dataUrlAsExternalPlugin from "jsr:@maemon4095-esbuild-x/plugin-data-url-as-external";
+import importWebWorker from "jsr:@maemon4095-esbuild-x/plugin-import-web-worker@0.0.1";
+import postcss from "jsr:@maemon4095-esbuild-x/plugin-postcss";
+import generateIndexFile, { linking } from "jsr:@maemon4095-esbuild-x/plugin-generate-index-file@0.1.2";
+import loaderOverride from "jsr:@maemon4095-esbuild-x/plugin-loader-override";
+import { denoPlugins } from "jsr:@luca/esbuild-deno-loader";
 
 const mode = Deno.args[0];
 switch (mode) {
@@ -17,91 +21,55 @@ switch (mode) {
         Deno.exit(1);
     }
 }
-
-const options = {
-    documentFilePath: "./index.html",
-    denoConfigPath: "./deno.json",
-    outdir: "./dist",
-    clearDistDir: true,
-    sourceMap: mode !== "build",
-    dropLabels: mode === "build" ? ["DEV"] : undefined,
-    serve: {
-        watch: ["./src", "./src-worker"]
+const distdir = path.join(import.meta.dirname!, "./dist");
+const configPath = path.join(import.meta.dirname!, "./deno.json");
+const context = await esbuild.context({
+    entryPoints: ["./src/index.tsx", "./src/index.css"],
+    bundle: true,
+    format: "esm",
+    platform: "browser",
+    jsx: "automatic",
+    jsxImportSource: "preact",
+    write: false,
+    outdir: distdir,
+    sourcemap: mode !== "build",
+    define: {
+        "import.meta.isDev": JSON.stringify(mode !== "build")
     },
-    esbuildPlugins: [
+    plugins: [
         dataUrlAsExternalPlugin(),
-        workerPlugin({ excludedPlugins: ["generated-files-replace-plugin"] }),
-        postCssPlugin({
+        loaderOverride({ importMap: configPath, loader: { ".d.ts": "empty" } }),
+        importWebWorker({ excludedPlugins: ["generated-files-replace-plugin", "emit-file"] }),
+        postcss({
             plugins: [
                 tailwindcss(tailwindConfig)
             ]
         }),
         generatedFilesPlugin(),
         generatedFilesReplacePlugin(),
-        emitFilesPlugin()
+        generateIndexFile({
+            staticFiles: [
+                { path: "./src/hotreload.ts", link: linking.script({}) }
+            ]
+        }),
+        emitFilesPlugin(),
+        ...denoPlugins({ configPath: configPath }),
     ]
-} satisfies BuilderOptions;
-const builder = new Builder(options);
+});
 
 switch (mode) {
     case "serve": {
-        await builder.serve();
+        await context.watch();
+        const { host, port } = await context.serve({ servedir: distdir });
+        const hostname = host === "0.0.0.0" ? "localhost" : host;
+        console.log(`Serving: http://${hostname}:${port}`);
         break;
     }
     case "build": {
-        await builder.build();
+        await context.rebuild();
+        await context.dispose();
         break;
     }
-}
-
-function dataUrlAsExternalPlugin(): esbuild.Plugin {
-    return {
-        name: "data-url-as-external",
-        setup(build) {
-            build.onResolve({ filter: /^data.*$/ }, args => {
-                return { path: args.path, external: true };
-            });
-        }
-    };
-}
-
-function workerPlugin(options?: { excludedPlugins: string[]; }): esbuild.Plugin {
-    return {
-        name: "worker",
-        setup(build) {
-
-            const pluginFilter = (() => {
-                const excluded = options?.excludedPlugins ?? [];
-                return (p: esbuild.Plugin) => {
-                    if (p.name === "worker") {
-                        return false;
-                    }
-                    return !excluded.includes(p.name);
-                };
-            })();
-
-            build.onResolve({ filter: /^.*\.worker\.ts$/ }, args => {
-                return {
-                    namespace: "worker", path: args.path.substring(0, args.path.length - 9) + "js",
-                    pluginData: path.isAbsolute(args.path) ? args.path : path.join(args.resolveDir, args.path)
-                };
-            });
-
-            build.onLoad({ filter: /.*/, namespace: "worker" }, async args => {
-                const plugins = build.initialOptions.plugins?.filter(p => pluginFilter(p));
-                const result = await esbuild.build({
-                    ...build.initialOptions,
-                    plugins,
-                    write: false,
-                    sourcemap: false,
-                    sourcesContent: false,
-                    entryPoints: [path.relative(".", args.pluginData)]
-                });
-
-                return { contents: result.outputFiles[0].contents, loader: "file" };
-            });
-        }
-    };
 }
 
 function generatedFilesPlugin(): esbuild.Plugin {
@@ -123,7 +91,7 @@ function generatedFilesPlugin(): esbuild.Plugin {
             });
         }
     };
-};
+}
 
 function generatedFilesReplacePlugin(): esbuild.Plugin {
     return {
@@ -135,7 +103,7 @@ function generatedFilesReplacePlugin(): esbuild.Plugin {
                 const outputs = args.metafile!.outputs;
                 const localPaths = Object.keys(outputs).map(p => path.relative(build.initialOptions.outdir!, p));
                 const replacement = JSON.stringify(localPaths);
-                console.log("replace", replacement);
+
                 for (const file of args.outputFiles!) {
                     const replaced = file.text.replaceAll(REPLACEMENT_STRING, replacement);
                     if (file.text === replaced) {
@@ -146,8 +114,7 @@ function generatedFilesReplacePlugin(): esbuild.Plugin {
             });
         }
     };
-};
-
+}
 
 function emitFilesPlugin(): esbuild.Plugin {
     return {

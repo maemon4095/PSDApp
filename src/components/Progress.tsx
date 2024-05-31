@@ -1,4 +1,4 @@
-import { h } from "preact";
+import type { h } from "preact";
 export default function Progress(
   { progress, status }: { progress: number; status: string },
 ) {

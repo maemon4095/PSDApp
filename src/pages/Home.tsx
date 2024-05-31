@@ -1,4 +1,3 @@
-import { h } from "preact";
 import { useContext } from "preact/hooks";
 import { switcher } from "~/App.tsx";
 import { parse } from "~/lib/psd.ts";
@@ -55,8 +54,7 @@ export default function Home() {
       <footer class="border shadow-inner rounded p-1 px-2 flex flex-row justify-center">
         <button
           onClick={() => {
-            context.setPopup(<Credits />, (e) => {
-            });
+            context.setPopup(<Credits />);
           }}
           class="link"
         >

@@ -1,9 +1,9 @@
 import {
-  ComponentChild,
-  ComponentChildren,
+  type ComponentChild,
+  type ComponentChildren,
   createContext,
-  Fragment,
-  h,
+  type Fragment,
+  type h,
 } from "preact";
 import { useMemo, useState } from "preact/hooks";
 

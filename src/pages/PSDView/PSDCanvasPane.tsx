@@ -1,8 +1,8 @@
-import { h } from "preact";
-import { Dispatch, useEffect, useReducer, useRef } from "preact/hooks";
-import { parse, Psd } from "~/lib/psd.ts";
+import type { h } from "preact";
+import { type Dispatch, useEffect, useReducer, useRef } from "preact/hooks";
+import { parse, type Psd } from "~/lib/psd.ts";
 import PSDCanvasArea, {
-  CanvasTransform,
+  type CanvasTransform,
 } from "~/pages/PSDView/PSDCanvasArea.tsx";
 import PSDCanvasProps from "~/pages/PSDView/PSDCanvasProps.tsx";
 import Button from "~/components/Button.tsx";

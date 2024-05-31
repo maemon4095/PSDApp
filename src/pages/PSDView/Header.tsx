@@ -1,4 +1,4 @@
-import { ComponentChildren, h } from "preact";
+import type { ComponentChildren } from "preact";
 
 export default function Header({ children }: { children: ComponentChildren }) {
   return (

@@ -1,8 +1,7 @@
-import { h } from "preact";
 import { useState } from "preact/hooks";
 import PsdStrucutureView from "~/pages/PSDView/PSDStructureView.tsx";
 import Partitioned from "~/components/Partitioned.tsx";
-import { Psd } from "~/lib/psd.ts";
+import type { Psd } from "~/lib/psd.ts";
 import Header from "~/pages/PSDView/Header.tsx";
 import CanvasPane from "~/pages/PSDView/PSDCanvasPane.tsx";
 

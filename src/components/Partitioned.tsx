@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { ComponentChildren, Fragment, h, toChildArray } from "preact";
+import { type ComponentChildren, type Fragment, type h, toChildArray } from "preact";
 
 type Direction = "row" | "column";
 

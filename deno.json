@@ -1,9 +1,15 @@
 {
   "compilerOptions": {
     "lib": ["deno.window", "dom", "dom.iterable"],
-    "jsxFactory": "h",
-    "jsxFragmentFactory": "Fragment",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "noImplicitOverride": true
+  },
+  "lint": {
+    "rules": {
+      "tags": ["warning"],
+      "include": ["verbatim-module-syntax"]
+    }
   },
   "imports": {
     "~/": "./src/",
