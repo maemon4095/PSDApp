@@ -1,5 +1,5 @@
-import { ComponentChildren, h } from "preact";
-type Props = h.JSX.HTMLAttributes<HTMLButtonElement> & {
+import type { ComponentChildren, JSX } from "preact";
+type Props = JSX.HTMLAttributes<HTMLButtonElement> & {
   children?: ComponentChildren;
 };
 

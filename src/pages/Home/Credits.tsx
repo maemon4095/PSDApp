@@ -1,5 +1,3 @@
-import { h } from "preact";
-
 type Credit = {
   name: string;
   url: string;

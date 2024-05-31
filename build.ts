@@ -1,8 +1,13 @@
-import { Builder, BuilderOptions } from "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.4/src/mod.ts";
 import tailwindcss from "npm:tailwindcss";
-import postCssPlugin from "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.4/plugins/postCssPlugin.ts";
 import tailwindConfig from "./tailwind.config.js";
-import * as path from "https://deno.land/std@0.224.0/path/mod.ts";
+import * as path from "jsr:@std/path";
+import * as esbuild from "npm:esbuild";
+import dataUrlAsExternalPlugin from "jsr:@maemon4095-esbuild-x/plugin-data-url-as-external";
+import importWebWorker from "jsr:@maemon4095-esbuild-x/plugin-import-web-worker@0.1.0";
+import postcss from "jsr:@maemon4095-esbuild-x/plugin-postcss";
+import generateIndexFile, { linking } from "jsr:@maemon4095-esbuild-x/plugin-generate-index-file@0.1.2";
+import loaderOverride from "jsr:@maemon4095-esbuild-x/plugin-loader-override@0.1.0";
+import { denoPlugins } from "jsr:@luca/esbuild-deno-loader";
 
 const mode = Deno.args[0];
 switch (mode) {
@@ -16,46 +21,136 @@ switch (mode) {
         Deno.exit(1);
     }
 }
-
-const options = {
-    documentFilePath: "./index.html",
-    denoConfigPath: "./deno.json",
-    outdir: "./dist",
-    clearDistDir: true,
-    sourceMap: mode !== "build",
-    dropLabels: mode === "build" ? ["DEV"] : undefined,
-    serve: {
-        watch: ["./src", "./src-worker"]
+const distdir = path.join(import.meta.dirname!, "./dist");
+const configPath = path.join(import.meta.dirname!, "./deno.json");
+const context = await esbuild.context({
+    entryPoints: ["./src/index.tsx", "./src/index.css"],
+    bundle: true,
+    format: "esm",
+    platform: "browser",
+    jsx: "automatic",
+    jsxImportSource: "preact",
+    assetNames: "[name]",
+    write: false,
+    outdir: distdir,
+    sourcemap: mode !== "build",
+    loader: { ".d.ts": "empty" },
+    define: {
+        "import.meta.isDev": JSON.stringify(mode !== "build")
     },
-    esbuildPlugins: [
-        postCssPlugin({
+    plugins: [
+        cleanOutdir(),
+        dataUrlAsExternalPlugin(),
+        loaderOverride({ importMap: configPath }),
+        importWebWorker({ excludedPlugins: ["generated-files-replace-plugin", "emit-file", "clean-outdir"] }),
+        postcss({
             plugins: [
                 tailwindcss(tailwindConfig)
             ]
         }),
-
-        {
-            name: "clone service worker",
-            setup(build) {
-                build.onEnd(async () => {
-                    const outdir = build.initialOptions.outdir!;
-                    const serviceWorkerPath = "./src-worker/worker.js";
-                    await Deno.copyFile(serviceWorkerPath, path.join(outdir, path.basename(serviceWorkerPath)));
-                });
-            }
-        }
+        generatedFilesPlugin(),
+        generatedFilesReplacePlugin(),
+        generateIndexFile({
+            staticFiles: [
+                { path: "./public/icon.svg", link: linking.link({ rel: "shortcut icon" }) },
+                { path: "./public/manifest.webmanifest", link: linking.link({ rel: "manifest" }) },
+                ...(mode === "build" ? [] : [{ path: "./public/hotreload.js", link: linking.script({}) }])
+            ],
+        }),
+        emitFilesPlugin(),
+        ...denoPlugins({ configPath: configPath }),
     ]
-} satisfies BuilderOptions;
-const builder = new Builder(options);
+});
 
 switch (mode) {
     case "serve": {
-        await builder.serve();
+        await context.watch();
+        const { host, port } = await context.serve({ servedir: distdir });
+        const hostname = host === "0.0.0.0" ? "localhost" : host;
+        console.log(`Serving: http://${hostname}:${port}`);
         break;
     }
     case "build": {
-        await builder.build();
+        await context.rebuild();
+        await context.dispose();
         break;
     }
 }
 
+function generatedFilesPlugin(): esbuild.Plugin {
+    return {
+        name: "generated-files-plugin",
+        setup(build) {
+            build.initialOptions.metafile = true;
+            build.initialOptions.write = false;
+            const REPLACEMENT_STRING = `["GENERATED_FILES_REPLACEMENT"]`;
+
+            build.onResolve({ filter: /^\$GENERATED_FILES$/ }, (args) => {
+                return {
+                    path: args.importer, namespace: "generated-files-plugin"
+                };
+            });
+
+            build.onLoad({ filter: /.*/, namespace: "generated-files-plugin" }, () => {
+                return { contents: `export default ${REPLACEMENT_STRING};` };
+            });
+        }
+    };
+}
+
+function generatedFilesReplacePlugin(): esbuild.Plugin {
+    return {
+        name: "generated-files-replace-plugin",
+        setup(build) {
+            const REPLACEMENT_STRING = `["GENERATED_FILES_REPLACEMENT"]`;
+
+            build.onEnd(args => {
+                const outputs = args.metafile!.outputs;
+                const localPaths = Object.keys(outputs).map(p => path.relative(build.initialOptions.outdir!, p));
+                const replacement = JSON.stringify(localPaths);
+
+                for (const file of args.outputFiles!) {
+                    const replaced = file.text.replaceAll(REPLACEMENT_STRING, replacement);
+                    if (file.text === replaced) {
+                        continue;
+                    }
+                    file.contents = new TextEncoder().encode(replaced);
+                }
+            });
+        }
+    };
+}
+
+function emitFilesPlugin(): esbuild.Plugin {
+    return {
+        name: "emit-file",
+        setup(build) {
+            build.onEnd(async args => {
+                const outputFiles = args.outputFiles!;
+                for (const file of outputFiles) {
+                    await Deno.mkdir(path.dirname(file.path), { recursive: true });
+                    await Deno.writeFile(file.path, file.contents);
+                }
+            });
+        }
+    };
+}
+
+function cleanOutdir(): esbuild.Plugin {
+    return {
+        name: "clean-outdir",
+        setup(build) {
+            const { outdir } = build.initialOptions;
+            if (outdir === undefined) {
+                throw new Error("outdir must be set.");
+            }
+            build.onStart(async () => {
+                try {
+                    await Deno.remove(outdir, { recursive: true });
+                } catch {
+                    console.log("Failed to clear outdir.");
+                }
+            });
+        }
+    };
+}

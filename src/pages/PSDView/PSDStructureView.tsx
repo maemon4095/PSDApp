@@ -1,98 +1,85 @@
-import { ComponentChildren, Fragment, h } from "preact";
-import { useMemo, useState } from "preact/hooks";
-import { Group, Layer } from "~/lib/psd.ts";
+import type { ComponentChildren } from "preact";
+import { useReducer, useState } from "preact/hooks";
+import type { Group, Layer, Psd } from "~/lib/psd.ts";
 
 type Callbacks = {
   onChange: () => void;
 };
+type Node = Psd | Group | Layer;
 
 export default function PsdStrucutureView(
-  { roots, ...callbacks }: { roots: (Layer | Group)[] } & Callbacks,
+  { psd, ...callbacks }: { psd: Node } & Callbacks,
 ) {
-  return (
-    <ul class="[&_ul>li]:ml-4 min-w-max">
-      <PsdStrucutureTree roots={roots} {...callbacks} />
-    </ul>
-  );
+  return <Entry node={psd} {...callbacks} />;
 }
 
-function PsdStrucutureTree(
-  { roots, ...callbacks }: { roots: (Layer | Group)[] } & Callbacks,
+function Entry(
+  { node, ...callbacks }: { node: Node } & Callbacks,
 ) {
-  const items = useMemo(
-    () => roots.map((e) => <Entry elem={e} {...callbacks} />),
-    [roots, callbacks],
-  );
-
-  return (
-    <>
-      {items}
-    </>
-  );
-}
-
-function Entry({ elem, ...callbacks }: { elem: Layer | Group } & Callbacks) {
-  const entry = elem.type === "Group"
-    ? <GroupEntry group={elem as unknown as Group} {...callbacks} />
-    : <LayerEntry layer={elem} {...callbacks} />;
-
-  return (
-    <li>
-      {entry}
-    </li>
-  );
+  switch (node.type) {
+    case "Photoshop":
+      return (
+        <ul class="[&_ul>li]:ml-4 min-w-max">
+          {node.children.map((node) => <Entry node={node} {...callbacks} />)}
+        </ul>
+      );
+    case "Group":
+      return <GroupEntry group={node} {...callbacks} />;
+    case "Layer":
+      return <LayerEntry layer={node} {...callbacks} />;
+  }
 }
 
 function LayerEntry({ layer, onChange }: { layer: Layer } & Callbacks) {
-  const [visible, rawSetVisible] = useState(layer.visible);
-  const setVisible = (e: boolean) => {
-    if (e === visible) {
-      return;
-    }
-    rawSetVisible(e);
-    layer.visible = e;
-    onChange?.();
-  };
+  const [visible, toggleVisible] = useReducer(
+    (old: boolean, _: void): boolean => {
+      layer.visible = !old;
+      onChange?.();
+      return !old;
+    },
+    layer.visible,
+  );
 
   const indicator = (
     <input
       type="checkbox"
       checked={visible}
       onClick={(e) => e.stopPropagation()}
-      onInput={() => setVisible(!visible)}
+      onInput={() => toggleVisible()}
     />
   );
 
   return (
-    <HeaderContainer
-      indicator={indicator}
-      onClick={() => setVisible(!visible)}
-    >
-      <span
-        data-hidden={!visible}
-        class="flex flex-row items-center gap-1 attrhide "
+    <li>
+      <HeaderContainer
+        indicator={indicator}
+        onClick={() => toggleVisible()}
       >
-        <span>{layer.name}</span>
-      </span>
-    </HeaderContainer>
+        <span
+          data-hidden={!visible}
+          class="flex flex-row items-center gap-1 attrhide "
+        >
+          <span>{layer.name}</span>
+        </span>
+      </HeaderContainer>
+    </li>
   );
 }
 
 function GroupEntry({ group, onChange }: { group: Group } & Callbacks) {
   const [collapsed, setCollapsed] = useState(!group.visible);
-  const [visible, rawSetVisible] = useState(group.visible);
+  const [visible, toggleVisible] = useReducer(
+    (old: boolean, _: void): boolean => {
+      group.visible = !old;
+      onChange?.();
+      return !old;
+    },
+    group.visible,
+  );
   const buttonIcon = collapsed ? "▶" : "▼";
-  const setVisible = (e: boolean) => {
-    if (e === visible) {
-      return;
-    }
-    rawSetVisible(e);
-    group.visible = e;
-    onChange?.();
-  };
 
   return (
-    <>
+    <li>
       <HeaderContainer
         indicator={buttonIcon}
         onClick={() => setCollapsed((e) => !e)}
@@ -101,7 +88,7 @@ function GroupEntry({ group, onChange }: { group: Group } & Callbacks) {
           data-hidden={!visible}
           onClick={(e) => {
             e.stopPropagation();
-            setVisible(!visible);
+            toggleVisible();
           }}
           class="border px-1 bg-white attrhide"
         >
@@ -114,9 +101,9 @@ function GroupEntry({ group, onChange }: { group: Group } & Callbacks) {
         data-hidden={!visible}
         class="attrhide pointer-none-on-attrhide"
       >
-        <PsdStrucutureTree roots={group.children} onChange={onChange} />
+        {group.children.map((e) => <Entry node={e} onChange={onChange} />)}
       </ul>
-    </>
+    </li>
   );
 }
 

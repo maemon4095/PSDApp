@@ -1,9 +1,9 @@
-import { h } from "preact";
-import { useContext } from "preact/hooks";
 import { switcher } from "~/App.tsx";
-import { parsePsd } from "~/lib/psd.ts";
+import { parse } from "~/lib/psd.ts";
+import { useContext } from "preact/hooks";
 import { DefaultLayoutContext } from "~/layout/default.tsx";
 import Credits from "~/pages/Home/Credits.tsx";
+import Loading from "~/components/Loading.tsx";
 
 export default function Home() {
   const context = useContext(DefaultLayoutContext);
@@ -12,8 +12,12 @@ export default function Home() {
     if (!files) return;
     const file = files.item(0);
     if (!file) return;
-    parsePsd(file).then((psd) => {
-      switcher.switch("viewer", { psd });
+    context.setPopup(<Loading name={file.name} />, (e) => e.preventDefault());
+
+    file.arrayBuffer().then(async (buf) => {
+      const psd = await parse(buf);
+      context.setPopup(null);
+      switcher.switch("viewer", { psd, filename: file.name });
     });
   };
 
@@ -53,8 +57,7 @@ export default function Home() {
       <footer class="border shadow-inner rounded p-1 px-2 flex flex-row justify-center">
         <button
           onClick={() => {
-            context.setPopup(<Credits />, (e) => {
-            });
+            context.setPopup(<Credits />);
           }}
           class="link"
         >

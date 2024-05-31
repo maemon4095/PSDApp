@@ -1,8 +1,7 @@
-import { h } from "preact";
-import { MutableRef, useState } from "preact/hooks";
-import { Psd } from "~/lib/psd.ts";
+import { type MutableRef, useState } from "preact/hooks";
+import type { Psd } from "~/lib/psd.ts";
 import PSDCanvas from "~/pages/PSDView/PSDCanvas.tsx";
-import { CanvasTransformDispatch } from "~/pages/PSDView/PSDCanvasPane.tsx";
+import type { CanvasTransformDispatch } from "~/pages/PSDView/PSDCanvasPane.tsx";
 
 export type CanvasTransform = { scale: number; x: number; y: number };
 
@@ -22,7 +21,7 @@ export default function PSDCanvasArea(
   return (
     <div
       ref={containerRef}
-      class="overflow-hidden translate-x-0 bg-slate-200"
+      class="overflow-hidden translate-x-0 bg-slate-200 bg-blank"
       onWheel={(e) => {
         const sign = Math.sign(-e.deltaY);
         const containerRect = containerRef.current!.getBoundingClientRect();

@@ -1,9 +1,9 @@
-import { h } from "preact";
+import type { JSX } from "preact";
 import Header from "~/pages/PSDView/Header.tsx";
-import { CanvasTransform } from "~/pages/PSDView/PSDCanvasArea.tsx";
+import type { CanvasTransform } from "~/pages/PSDView/PSDCanvasArea.tsx";
 import Button from "~/components/Button.tsx";
 import {
-  CanvasTransformDispatch,
+  type CanvasTransformDispatch,
   commandFit,
 } from "~/pages/PSDView/PSDCanvasPane.tsx";
 
@@ -51,7 +51,7 @@ function TransformInput(
     onInput: (v: number) => void;
   },
 ) {
-  const onChange: h.JSX.InputEventHandler<HTMLInputElement> = (e) => {
+  const onChange: JSX.InputEventHandler<HTMLInputElement> = (e) => {
     const target = e.currentTarget;
     let value = parseFloat(target.value);
     if (Number.isNaN(value)) {
