@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { type ComponentChildren, type Fragment, type h, toChildArray } from "preact";
+import { type ComponentChildren, type JSX, toChildArray } from "preact";
 
 type Direction = "row" | "column";
 
@@ -101,13 +101,13 @@ export default function Partitioned(
 function Handle(
   props: {
     dir: Direction;
-    onPointerDown?: (e: h.JSX.TargetedPointerEvent<HTMLDivElement>) => void;
+    onPointerDown?: (e: JSX.TargetedPointerEvent<HTMLDivElement>) => void;
   },
 ) {
   const { dir } = props;
   const cursor = dir === "row" ? "col-resize" : "row-resize";
 
-  const style: h.JSX.CSSProperties = {
+  const style: JSX.CSSProperties = {
     flex: `0 0 ${handleSize}px`,
     flexDirection: dir,
     cursor,

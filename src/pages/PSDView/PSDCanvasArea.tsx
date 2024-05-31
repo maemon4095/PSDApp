@@ -1,4 +1,3 @@
-import type { h } from "preact";
 import { type MutableRef, useState } from "preact/hooks";
 import type { Psd } from "~/lib/psd.ts";
 import PSDCanvas from "~/pages/PSDView/PSDCanvas.tsx";

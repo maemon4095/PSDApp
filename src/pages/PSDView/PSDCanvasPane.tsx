@@ -1,4 +1,3 @@
-import type { h } from "preact";
 import { type Dispatch, useEffect, useReducer, useRef } from "preact/hooks";
 import { parse, type Psd } from "~/lib/psd.ts";
 import PSDCanvasArea, {

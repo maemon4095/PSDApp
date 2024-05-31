@@ -2,7 +2,7 @@ export {
     type PhotoshopNode, type Layer, type Group,
     render
 } from "psd";
-import { type Photoshop as Psd } from "psd";
+import type { Photoshop as Psd } from "psd";
 // @deno-types=@loader-types/file.d.ts
 import workerPath from "./psd.worker.ts";
 

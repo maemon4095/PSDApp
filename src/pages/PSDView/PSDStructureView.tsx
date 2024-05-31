@@ -1,5 +1,5 @@
-import type { ComponentChildren, Fragment, h } from "preact";
-import { type useMemo, useReducer, useState } from "preact/hooks";
+import type { ComponentChildren } from "preact";
+import { useReducer, useState } from "preact/hooks";
 import type { Group, Layer, Psd } from "~/lib/psd.ts";
 
 type Callbacks = {

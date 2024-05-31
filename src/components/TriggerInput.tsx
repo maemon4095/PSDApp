@@ -1,9 +1,9 @@
-import type { ComponentChildren, h } from "preact";
+import type { ComponentChildren, JSX } from "preact";
 
 type Props = {
   type: string;
   children?: ComponentChildren;
-} & h.JSX.HTMLAttributes<HTMLInputElement>;
+} & JSX.HTMLAttributes<HTMLInputElement>;
 
 export default function TriggerInput({ children, ...attrs }: Props) {
   return (
