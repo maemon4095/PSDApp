@@ -3,7 +3,7 @@ import tailwindConfig from "./tailwind.config.js";
 import * as path from "jsr:@std/path";
 import * as esbuild from "npm:esbuild";
 import dataUrlAsExternalPlugin from "jsr:@maemon4095-esbuild-x/plugin-data-url-as-external";
-import importWebWorker from "jsr:@maemon4095-esbuild-x/plugin-import-web-worker@0.0.1";
+import importWebWorker from "jsr:@maemon4095-esbuild-x/plugin-import-web-worker@0.1.0";
 import postcss from "jsr:@maemon4095-esbuild-x/plugin-postcss";
 import generateIndexFile, { linking } from "jsr:@maemon4095-esbuild-x/plugin-generate-index-file@0.1.2";
 import loaderOverride from "jsr:@maemon4095-esbuild-x/plugin-loader-override@0.1.0";
@@ -30,6 +30,7 @@ const context = await esbuild.context({
     platform: "browser",
     jsx: "automatic",
     jsxImportSource: "preact",
+    assetNames: "[name]",
     write: false,
     outdir: distdir,
     sourcemap: mode !== "build",
@@ -38,9 +39,10 @@ const context = await esbuild.context({
         "import.meta.isDev": JSON.stringify(mode !== "build")
     },
     plugins: [
+        cleanOutdir(),
         dataUrlAsExternalPlugin(),
         loaderOverride({ importMap: configPath }),
-        importWebWorker({ excludedPlugins: ["generated-files-replace-plugin", "emit-file"] }),
+        importWebWorker({ excludedPlugins: ["generated-files-replace-plugin", "emit-file", "clean-outdir"] }),
         postcss({
             plugins: [
                 tailwindcss(tailwindConfig)
@@ -50,10 +52,10 @@ const context = await esbuild.context({
         generatedFilesReplacePlugin(),
         generateIndexFile({
             staticFiles: [
-                { path: "./src/hotreload.ts", link: linking.script({}) },
                 { path: "./public/icon.svg", link: linking.link({ rel: "shortcut icon" }) },
-                { path: "./public/manifest.webmanifest", link: linking.link({ rel: "manifest" }) }
-            ]
+                { path: "./public/manifest.webmanifest", link: linking.link({ rel: "manifest" }) },
+                ...(mode === "build" ? [] : [{ path: "./public/hotreload.js", link: linking.script({}) }])
+            ],
         }),
         emitFilesPlugin(),
         ...denoPlugins({ configPath: configPath }),
@@ -128,6 +130,25 @@ function emitFilesPlugin(): esbuild.Plugin {
                 for (const file of outputFiles) {
                     await Deno.mkdir(path.dirname(file.path), { recursive: true });
                     await Deno.writeFile(file.path, file.contents);
+                }
+            });
+        }
+    };
+}
+
+function cleanOutdir(): esbuild.Plugin {
+    return {
+        name: "clean-outdir",
+        setup(build) {
+            const { outdir } = build.initialOptions;
+            if (outdir === undefined) {
+                throw new Error("outdir must be set.");
+            }
+            build.onStart(async () => {
+                try {
+                    await Deno.remove(outdir, { recursive: true });
+                } catch {
+                    console.log("Failed to clear outdir.");
                 }
             });
         }
