@@ -6,7 +6,7 @@ import dataUrlAsExternalPlugin from "jsr:@maemon4095-esbuild-x/plugin-data-url-a
 import importWebWorker from "jsr:@maemon4095-esbuild-x/plugin-import-web-worker@0.0.1";
 import postcss from "jsr:@maemon4095-esbuild-x/plugin-postcss";
 import generateIndexFile, { linking } from "jsr:@maemon4095-esbuild-x/plugin-generate-index-file@0.1.2";
-import loaderOverride from "jsr:@maemon4095-esbuild-x/plugin-loader-override";
+import loaderOverride from "jsr:@maemon4095-esbuild-x/plugin-loader-override@0.1.0";
 import { denoPlugins } from "jsr:@luca/esbuild-deno-loader";
 
 const mode = Deno.args[0];
@@ -33,12 +33,13 @@ const context = await esbuild.context({
     write: false,
     outdir: distdir,
     sourcemap: mode !== "build",
+    loader: { ".d.ts": "empty" },
     define: {
         "import.meta.isDev": JSON.stringify(mode !== "build")
     },
     plugins: [
         dataUrlAsExternalPlugin(),
-        loaderOverride({ importMap: configPath, loader: { ".d.ts": "empty" } }),
+        loaderOverride({ importMap: configPath }),
         importWebWorker({ excludedPlugins: ["generated-files-replace-plugin", "emit-file"] }),
         postcss({
             plugins: [
@@ -49,7 +50,9 @@ const context = await esbuild.context({
         generatedFilesReplacePlugin(),
         generateIndexFile({
             staticFiles: [
-                { path: "./src/hotreload.ts", link: linking.script({}) }
+                { path: "./src/hotreload.ts", link: linking.script({}) },
+                { path: "./public/icon.svg", link: linking.link({ rel: "shortcut icon" }) },
+                { path: "./public/manifest.webmanifest", link: linking.link({ rel: "manifest" }) }
             ]
         }),
         emitFilesPlugin(),
