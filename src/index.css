@@ -73,8 +73,6 @@ h3 {
         grid-auto-columns: 1fr;
     }    
     .child-center {
-        grid-auto-rows: max-content;
-        grid-auto-columns: max-content;
         display: grid;
         place-content: center;
     }    
