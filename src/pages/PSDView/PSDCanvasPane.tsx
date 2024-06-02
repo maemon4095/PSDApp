@@ -84,7 +84,10 @@ export default function CanvasPane(
           onInput={(e) => {
             const file = e.currentTarget.files?.[0];
             if (!file) return;
-            context.setPopup(<Loading name={file.name} />);
+            context.setPopup(
+              <Loading name={file.name} />,
+              (e) => e.preventDefault(),
+            );
             file.arrayBuffer().then(async (raw) => {
               const psd = await parse(raw);
               context.setPopup(null);
