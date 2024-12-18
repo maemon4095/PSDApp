@@ -5,7 +5,7 @@ import {
   useReducer,
   useRef,
 } from "preact/hooks";
-import { parse, type Psd } from "~/lib/psd.ts";
+import { PsdServer, type PsdStructureRoot } from "~/lib/psd.ts";
 import PSDCanvasArea, {
   type CanvasTransform,
 } from "~/pages/PSDView/PSDCanvasArea.tsx";
@@ -26,14 +26,14 @@ export type CanvasTransformAction =
 export type CanvasTransformDispatch = Dispatch<CanvasTransformAction>;
 
 export default function CanvasPane(
-  { filename, version, psd }: { filename: string; version: number; psd: Psd },
+  { filename, psdStructure }: {
+    filename: string;
+    psdStructure: PsdStructureRoot;
+  },
 ) {
   const context = useContext(DefaultLayoutContext);
-  const [transform, setTransform] = useReducer<
-    CanvasTransform,
-    CanvasTransformAction
-  >(
-    (old, action) => {
+  const [transform, setTransform] = useReducer(
+    (old: CanvasTransform, action: CanvasTransformAction) => {
       if (action === commandReset) {
         return { scale: 1, x: 0, y: 0 };
       }
@@ -54,25 +54,24 @@ export default function CanvasPane(
   function fitCanvas() {
     const container = canvasAreaRef.current!;
     const containerRect = container.getBoundingClientRect();
-    const scaleW = containerRect.width / psd.width;
-    const scaleH = containerRect.height / psd.height;
+    const scaleW = containerRect.width / psdStructure.width;
+    const scaleH = containerRect.height / psdStructure.height;
     const scale = Math.min(scaleW, scaleH);
-    const x = (containerRect.width - psd.width * scale) / 2;
-    const y = (containerRect.height - psd.height * scale) / 2;
+    const x = (containerRect.width - psdStructure.width * scale) / 2;
+    const y = (containerRect.height - psdStructure.height * scale) / 2;
     return { scale, x: Math.floor(x), y: Math.floor(y) };
   }
 
   useEffect(() => {
     setTransform(commandFit);
-  }, [psd]);
+  }, []);
 
   return (
     <div class="grid grid-t-cols-[1fr] grid-t-rows-[auto_1fr_auto]">
       <PSDCanvasProps transform={transform} setTransform={setTransform} />
       <PSDCanvasArea
         containerRef={canvasAreaRef}
-        psd={psd}
-        version={version}
+        psdStructure={psdStructure}
         transform={transform}
         setTransform={setTransform}
       />
@@ -89,15 +88,23 @@ export default function CanvasPane(
               (e) => e.preventDefault(),
             );
             file.arrayBuffer().then(async (raw) => {
-              const psd = await parse(raw);
+              const psd = PsdServer.instance;
+              await psd.parse(raw);
+              const psdStructure = (await psd.getStructure())!;
+
               context.setPopup(null);
-              switcher.switch("viewer", { psd, filename: file.name });
+              switcher.switch("viewer", {
+                psdStructure,
+                filename: file.name,
+              });
             });
           }}
         >
           📂
         </TriggerInput>
-        <span class="ml-auto">{filename}@{psd.width}x{psd.height}</span>
+        <span class="ml-auto">
+          {filename}@{psdStructure.width}x{psdStructure.height}
+        </span>
       </div>
     </div>
   );

@@ -1,20 +1,19 @@
 import { type MutableRef, useState } from "preact/hooks";
-import type { Psd } from "~/lib/psd.ts";
+import type { PsdStructureRoot } from "~/lib/psd.ts";
 import PSDCanvas from "~/pages/PSDView/PSDCanvas.tsx";
 import type { CanvasTransformDispatch } from "~/pages/PSDView/PSDCanvasPane.tsx";
 
 export type CanvasTransform = { scale: number; x: number; y: number };
 
 type Props = {
-  psd: Psd;
+  psdStructure: PsdStructureRoot;
   containerRef: MutableRef<HTMLDivElement | null>;
-  version: number;
   transform?: CanvasTransform;
   setTransform: CanvasTransformDispatch;
 };
 
 export default function PSDCanvasArea(
-  { psd, version, transform, containerRef, setTransform }: Props,
+  { psdStructure, transform, containerRef, setTransform }: Props,
 ) {
   const [dragging, setDragging] = useState(false);
 
@@ -56,8 +55,7 @@ export default function PSDCanvasArea(
       onPointerCancel={() => setDragging(false)}
     >
       <PSDCanvas
-        psd={psd}
-        version={version}
+        psdStructure={psdStructure}
         transform={transform}
       />
     </div>

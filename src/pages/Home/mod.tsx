@@ -1,5 +1,5 @@
 import { switcher } from "~/App.tsx";
-import { parse } from "~/lib/psd.ts";
+import { PsdServer } from "~/lib/psd.ts";
 import { useContext, useState } from "preact/hooks";
 import { DefaultLayoutContext } from "~/layout/default.tsx";
 import Credits from "~/pages/Home/Credits.tsx";
@@ -19,9 +19,14 @@ export default function Home() {
     context.setPopup(<Loading name={file.name} />, (e) => e.preventDefault());
 
     file.arrayBuffer().then(async (buf) => {
-      const psd = await parse(buf);
+      const psd = PsdServer.instance;
+      await psd.parse(buf);
+      const psdStructure = (await psd.getStructure())!;
       context.setPopup(null);
-      switcher.switch("viewer", { psd, filename: file.name });
+      switcher.switch("viewer", {
+        psdStructure,
+        filename: file.name,
+      });
     });
   };
 

@@ -1,23 +1,15 @@
-import { useState } from "preact/hooks";
 import PsdStrucutureView from "~/pages/PSDView/PSDStructureView.tsx";
 import Partitioned from "~/components/Partitioned.tsx";
-import type { Psd } from "~/lib/psd.ts";
+import type { PsdStructureRoot } from "~/lib/psd.ts";
 import Header from "~/pages/PSDView/Header.tsx";
 import CanvasPane from "~/pages/PSDView/PSDCanvasPane.tsx";
 
 export default function PSDView(
-  { psd, filename }: { psd: Psd; filename: string },
+  { psdStructure, filename }: {
+    psdStructure: PsdStructureRoot;
+    filename: string;
+  },
 ) {
-  const [version, setVersion] = useState(0);
-  const onChange = () => {
-    setVersion((v) => {
-      if (Number.isSafeInteger(v + 1)) {
-        return v + 1;
-      }
-      return 0;
-    });
-  };
-
   return (
     <div class="size-full overflow-hidden grid grid-t-rows-[1fr]">
       <Partitioned firstSize={300} direction="row">
@@ -26,10 +18,15 @@ export default function PSDView(
             レイヤー
           </Header>
           <div class="overflow-auto">
-            <PsdStrucutureView psd={psd} onChange={onChange} />
+            <PsdStrucutureView
+              psdStructure={psdStructure}
+            />
           </div>
         </div>
-        <CanvasPane psd={psd} filename={filename} version={version} />
+        <CanvasPane
+          psdStructure={psdStructure}
+          filename={filename}
+        />
       </Partitioned>
     </div>
   );

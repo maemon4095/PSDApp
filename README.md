@@ -2,9 +2,11 @@
 ブラウザ上でPSDを覗くアプリ。
 [PSDTool](https://oov.github.io/psdtool/)に影響を受けて作成しています。
 
-
 # ビルドに必要なもの
 - [Deno](https://deno.com)
+
+# TODO
+- PSDTool拡張をサポート
 
 # ライセンス
 [MIT](./LICENSE)
