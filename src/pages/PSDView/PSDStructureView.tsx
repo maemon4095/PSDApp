@@ -1,40 +1,42 @@
 import type { ComponentChildren } from "preact";
 import { useReducer, useState } from "preact/hooks";
-import type { Group, Layer, Psd } from "~/lib/psd.ts";
-
-type Callbacks = {
-  onChange: () => void;
-};
-type Node = Psd | Group | Layer;
+import {
+  PsdServer,
+  type PsdStructureGroup,
+  type PsdStructureLayer,
+  type PsdStructureNode,
+} from "~/lib/psd.ts";
 
 export default function PsdStrucutureView(
-  { psd, ...callbacks }: { psd: Node } & Callbacks,
+  { psdStructure }: { psdStructure: PsdStructureNode },
 ) {
-  return <Entry node={psd} {...callbacks} />;
+  return <Entry node={psdStructure} />;
 }
 
 function Entry(
-  { node, ...callbacks }: { node: Node } & Callbacks,
+  { node }: { node: PsdStructureNode },
 ) {
   switch (node.type) {
     case "Photoshop":
       return (
         <ul class="[&_ul>li]:ml-4 min-w-max">
-          {node.children.map((node) => <Entry node={node} {...callbacks} />)}
+          {node.children.map((node) => <Entry node={node} />)}
         </ul>
       );
     case "Group":
-      return <GroupEntry group={node} {...callbacks} />;
+      return <GroupEntry group={node} />;
     case "Layer":
-      return <LayerEntry layer={node} {...callbacks} />;
+      return <LayerEntry layer={node} />;
   }
 }
 
-function LayerEntry({ layer, onChange }: { layer: Layer } & Callbacks) {
+function LayerEntry(
+  { layer }: { layer: PsdStructureLayer },
+) {
   const [visible, toggleVisible] = useReducer(
     (old: boolean, _: void): boolean => {
       layer.visible = !old;
-      onChange?.();
+      PsdServer.instance.update(layer.id, { visible: layer.visible });
       return !old;
     },
     layer.visible,
@@ -66,12 +68,14 @@ function LayerEntry({ layer, onChange }: { layer: Layer } & Callbacks) {
   );
 }
 
-function GroupEntry({ group, onChange }: { group: Group } & Callbacks) {
+function GroupEntry(
+  { group }: { group: PsdStructureGroup },
+) {
   const [collapsed, setCollapsed] = useState(!group.visible);
   const [visible, toggleVisible] = useReducer(
     (old: boolean, _: void): boolean => {
       group.visible = !old;
-      onChange?.();
+      PsdServer.instance.update(group.id, { visible: !old });
       return !old;
     },
     group.visible,
@@ -101,7 +105,7 @@ function GroupEntry({ group, onChange }: { group: Group } & Callbacks) {
         data-hidden={!visible}
         class="attrhide pointer-none-on-attrhide"
       >
-        {group.children.map((e) => <Entry node={e} onChange={onChange} />)}
+        {group.children.map((e) => <Entry node={e} />)}
       </ul>
     </li>
   );
