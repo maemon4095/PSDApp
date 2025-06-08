@@ -1,19 +1,23 @@
-import { type MutableRef, useState } from "preact/hooks";
-import type { PsdStructureRoot } from "~/lib/psd.ts";
+import { useState } from "preact/hooks";
+import type { PsdServer, PsdStructureRoot } from "~/lib/psd.ts";
 import PSDCanvas from "~/pages/PSDView/PSDCanvas.tsx";
 import type { CanvasTransformDispatch } from "~/pages/PSDView/PSDCanvasPane.tsx";
+import type { RefObject } from "preact";
 
 export type CanvasTransform = { scale: number; x: number; y: number };
 
 type Props = {
+  server: PsdServer;
   psdStructure: PsdStructureRoot;
-  containerRef: MutableRef<HTMLDivElement | null>;
+  containerRef: RefObject<HTMLDivElement>;
+  canvasRef: RefObject<HTMLCanvasElement>;
   transform?: CanvasTransform;
   setTransform: CanvasTransformDispatch;
 };
 
 export default function PSDCanvasArea(
-  { psdStructure, transform, containerRef, setTransform }: Props,
+  { server, psdStructure, transform, containerRef, canvasRef, setTransform }:
+    Props,
 ) {
   const [dragging, setDragging] = useState(false);
 
@@ -55,8 +59,10 @@ export default function PSDCanvasArea(
       onPointerCancel={() => setDragging(false)}
     >
       <PSDCanvas
+        server={server}
         psdStructure={psdStructure}
         transform={transform}
+        canvasRef={canvasRef}
       />
     </div>
   );

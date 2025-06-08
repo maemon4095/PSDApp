@@ -1,8 +1,7 @@
 import Home from "~/pages/Home/mod.tsx";
 import PSDView from "~/pages/PSDView/mod.tsx";
-import { createSwitcher } from "jsr:@maemon4095/preact-switcher";
-import Layout from "~/layout/default.tsx";
-
+import { createSwitcher } from "~/lib/switcher.ts";
+import Layout from "~/layouts/default.tsx";
 const paths = {
   home: Home,
   viewer: PSDView,

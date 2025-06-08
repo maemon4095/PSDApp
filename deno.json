@@ -11,9 +11,10 @@
     }
   },
   "imports": {
+    "@std/path": "jsr:@std/path@^1.1.0",
     "~/": "./src/",
-    "preact": "npm:preact",
-    "preact/hooks": "npm:preact/hooks",
+    "preact": "npm:preact@^10.26",
+    "preact/hooks": "npm:preact@^10.26/hooks",
     "@loader-types/": "https://raw.githubusercontent.com/maemon4095/deno-esbuilder/release/v0.3.3/plugins/loaderOverride/types/",
     "psd/": "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/"
   },

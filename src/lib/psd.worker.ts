@@ -40,15 +40,17 @@ onmessage = (e) => {
     }
 
     case "update": {
-      const id: number = e.data.id;
+      const id = e.data.id;
+      const pairs: [number, unknown][] = e.data.pairs;
       if (psdPair === undefined) {
         postMessage({ type: "update-done", id });
         return;
       }
-      const nodeId: number = e.data.nodeId;
-      const { map } = psdPair;
 
-      Object.assign(map[nodeId], e.data.props);
+      const { map } = psdPair;
+      for (const [nodeId, props] of pairs) {
+        Object.assign(map[nodeId], props);
+      }
 
       if (canvasRendererPair !== undefined) render();
 

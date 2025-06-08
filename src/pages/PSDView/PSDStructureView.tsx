@@ -1,132 +1,227 @@
-import type { ComponentChildren } from "preact";
-import { useReducer, useState } from "preact/hooks";
-import {
+import { useEffect, useState } from "preact/hooks";
+import type {
   PsdServer,
-  type PsdStructureGroup,
-  type PsdStructureLayer,
-  type PsdStructureNode,
+  PsdStructureGroup,
+  PsdStructureLayer,
+  PsdStructureRoot,
 } from "~/lib/psd.ts";
+import { useSelection } from "../../hooks/useSelection.ts";
+
+type GroupMode = "multiple" | "choice";
 
 export default function PsdStrucutureView(
-  { psdStructure }: { psdStructure: PsdStructureNode },
+  { server, psdStructure }: {
+    server: PsdServer;
+    psdStructure: PsdStructureRoot;
+  },
 ) {
-  return <Entry node={psdStructure} />;
+  return (
+    <RootEntry
+      mode="multiple"
+      server={server}
+      {...psdStructure}
+    />
+  );
 }
 
+type EntryProps = {
+  server: PsdServer;
+  mode: GroupMode;
+  groupId: number | string;
+  setVisible: (visible: boolean) => void;
+};
+
 function Entry(
-  { node }: { node: PsdStructureNode },
+  props: EntryProps & (PsdStructureGroup | PsdStructureLayer),
 ) {
-  switch (node.type) {
-    case "Photoshop":
-      return (
-        <ul class="[&_ul>li]:ml-4 min-w-max">
-          {node.children.map((node) => <Entry node={node} />)}
-        </ul>
-      );
+  switch (props.type) {
     case "Group":
-      return <GroupEntry group={node} />;
+      return <GroupEntry {...props} />;
     case "Layer":
-      return <LayerEntry layer={node} />;
+      return <LayerEntry {...props} />;
   }
 }
 
-function LayerEntry(
-  { layer }: { layer: PsdStructureLayer },
-) {
-  const [visible, toggleVisible] = useReducer(
-    (old: boolean, _: void): boolean => {
-      layer.visible = !old;
-      PsdServer.instance.update(layer.id, { visible: layer.visible });
-      return !old;
-    },
-    layer.visible,
+function RootEntry({ id, server, mode, children }: {
+  server: PsdServer;
+  mode: GroupMode;
+} & PsdStructureRoot) {
+  const [selection, select, unselect, setLimit] = useSelection(
+    () => Object.fromEntries(children.map((e) => [e.id, e.visible])),
+    mode === "choice" ? 1 : undefined,
   );
 
-  const indicator = (
-    <input
-      type="checkbox"
-      checked={visible}
-      onClick={(e) => e.stopPropagation()}
-      onInput={() => toggleVisible()}
-    />
-  );
+  switch (mode) {
+    case "multiple":
+      setLimit(undefined);
+      break;
+    case "choice":
+      setLimit(1);
+      break;
+  }
+
+  useEffect(() => {
+    server.update(
+      ...Object
+        .entries(selection).map((
+          [key, visible],
+        ) => ([Number(key), { visible }] as const)),
+    );
+  }, [selection]);
 
   return (
-    <li>
-      <HeaderContainer
-        indicator={indicator}
-        onClick={() => toggleVisible()}
-      >
-        <span
-          data-hidden={!visible}
-          class="flex flex-row items-center gap-1 attrhide "
-        >
-          <span>{layer.name}</span>
-        </span>
-      </HeaderContainer>
+    <ul class="[&_ul>li]:ml-4 min-w-max select-none">
+      {children.map((node) => (
+        <Entry
+          {...node}
+          key={node.id}
+          mode={mode}
+          groupId={id}
+          server={server}
+          visible={selection[node.id]}
+          setVisible={(v) => v ? select(node.id) : unselect(node.id)}
+        />
+      ))}
+    </ul>
+  );
+}
+
+function LayerEntry(
+  { groupId, name, mode, visible, setVisible }:
+    & EntryProps
+    & PsdStructureLayer,
+) {
+  return (
+    <li class="psd-node" data-selected={visible}>
+      <div class="psd-entry">
+        <label class="flex flex-row gap-1 psd-entry-label">
+          <input
+            type={mode == "multiple" ? "checkbox" : "radio"}
+            checked={visible}
+            name={`psd-group-${groupId}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setVisible(e.currentTarget.checked);
+            }}
+          />
+
+          <span class="border px-1 bg-white">{name}</span>
+        </label>
+      </div>
     </li>
   );
 }
 
 function GroupEntry(
-  { group }: { group: PsdStructureGroup },
+  { server, id, groupId, mode, visible, children, name, setVisible }:
+    & EntryProps
+    & PsdStructureGroup,
 ) {
-  const [collapsed, setCollapsed] = useState(!group.visible);
-  const [visible, toggleVisible] = useReducer(
-    (old: boolean, _: void): boolean => {
-      group.visible = !old;
-      PsdServer.instance.update(group.id, { visible: !old });
-      return !old;
-    },
-    group.visible,
+  const [collapsed, setCollapsed] = useState(!visible);
+  const [childMode, setChildMode] = useState<GroupMode>("multiple");
+  const [selection, select, unselect, setLimit] = useSelection(
+    () => Object.fromEntries(children.map((e) => [e.id, e.visible])),
+    mode === "choice" ? 1 : undefined,
   );
-  const buttonIcon = collapsed ? "▶" : "▼";
+
+  useEffect(() => {
+    server.update(
+      ...Object
+        .entries(selection).map((
+          [key, visible],
+        ) => ([Number(key), { visible }] as const)),
+    );
+  }, [selection]);
 
   return (
-    <li>
-      <HeaderContainer
-        indicator={buttonIcon}
+    <li class="psd-node" data-selected={visible}>
+      <div
+        class="psd-entry"
         onClick={() => setCollapsed((e) => !e)}
       >
-        <button
-          data-hidden={!visible}
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleVisible();
-          }}
-          class="border px-1 bg-white attrhide"
+        <PsdGroupToggle
+          collapsed={collapsed}
+          onChange={setCollapsed}
+        />
+        <label
+          onClick={(e) => e.stopPropagation()}
+          class="flex flex-row gap-1 psd-entry-label"
         >
-          <img src=""></img>
-          <span>{group.name}</span>
-        </button>
-      </HeaderContainer>
+          <input
+            type={mode == "multiple" ? "checkbox" : "radio"}
+            name={`psd-group-${groupId}`}
+            onChange={(e) => {
+              e.stopPropagation();
+              setVisible(e.currentTarget.checked);
+            }}
+            checked={visible}
+          />
+          <span class="border px-1 bg-white">{name}</span>
+        </label>
+
+        <label
+          class="ml-auto has-[:focus]:outline rounded outline-2 has-[:checked]:opacity-100 opacity-30"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            type="checkbox"
+            class="opacity-0 size-0 absolute"
+            onChange={(e) => {
+              if (e.currentTarget.checked) {
+                setLimit(1);
+                setChildMode("choice");
+              } else {
+                setLimit(undefined);
+                setChildMode("multiple");
+              }
+            }}
+          />
+          <span class="border px-1 bg-white">択一</span>
+        </label>
+      </div>
       <ul
         hidden={collapsed}
-        data-hidden={!visible}
-        class="attrhide pointer-none-on-attrhide"
+        inert={!visible}
+        class="pointer-none-when-not-selected"
       >
-        {group.children.map((e) => <Entry node={e} />)}
+        {children.map((node) => (
+          <Entry
+            {...node}
+            mode={childMode}
+            key={node.id}
+            groupId={id}
+            server={server}
+            visible={selection[node.id]}
+            setVisible={(v) => v ? select(node.id) : unselect(node.id)}
+          />
+        ))}
       </ul>
     </li>
   );
 }
 
-function HeaderContainer(
-  { indicator, children, onClick }: {
-    indicator: ComponentChildren;
-    children: ComponentChildren;
-    onClick?: () => void;
+function PsdGroupToggle(
+  { collapsed: collapsed, onChange }: {
+    collapsed: boolean;
+    onChange: (collapsed: boolean) => void;
   },
 ) {
+  const icon = collapsed ? "▶" : "▼";
+
   return (
-    <button
-      onClick={() => onClick?.()}
-      class="flex flex-row items-center border -mb-px bg-stone-50 p-1 w-full"
+    <label
+      class="has-[:focus]:outline rounded outline-2"
+      onClick={(e) => e.stopPropagation()}
     >
-      <span class="size-4 mr-1 grid place-content-center pointer-events-none">
-        {indicator}
+      <input
+        type="checkbox"
+        checked={!collapsed}
+        onChange={(e) => onChange(!e.currentTarget.checked)}
+        class="opacity-0 size-0 absolute"
+      />
+      <span>
+        {icon}
       </span>
-      {children}
-    </button>
+    </label>
   );
 }
