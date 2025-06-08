@@ -60,6 +60,7 @@ export default function CanvasPane(
   return (
     <div class="grid grid-t-cols-[1fr] grid-t-rows-[auto_1fr_auto]">
       <PSDCanvasPaneHeader
+        filename={filename}
         transform={transform}
         setTransform={setTransform}
         canvasRef={canvasRef}

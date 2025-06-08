@@ -1,13 +1,16 @@
 import type { JSX, RefObject } from "preact";
 import Header from "~/pages/PSDView/Header.tsx";
 import type { CanvasTransform } from "~/pages/PSDView/PSDCanvasArea.tsx";
+import * as path from "@std/path";
+
 import {
   type CanvasTransformDispatch,
   commandFit,
 } from "~/pages/PSDView/PSDCanvasPane.tsx";
 
 export default function PSDCanvasPaneHeader(
-  { transform, setTransform, canvasRef }: {
+  { filename, transform, setTransform, canvasRef }: {
+    filename: string;
     transform?: CanvasTransform;
     setTransform: CanvasTransformDispatch;
     canvasRef: RefObject<HTMLCanvasElement>;
@@ -56,6 +59,15 @@ export default function PSDCanvasPaneHeader(
           if (canvas === null) return;
 
           canvas.toBlob((blob) => {
+            if (blob === null) return;
+            const ext = path.extname(filename);
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement("a");
+            anchor.download = filename.slice(0, -ext.length) + ".png";
+            anchor.href = url;
+            anchor.click();
+            anchor.remove();
+            URL.revokeObjectURL(url);
           });
         }}
       >
