@@ -153,7 +153,7 @@ export default function Credits() {
       <div>
         <h1>クレジット</h1>
       </div>
-      {credits.map((p) => <LicenseEntry {...p} />)}
+      {credits.map((p) => <LicenseEntry key={p.name} {...p} />)}
     </div>
   );
 }

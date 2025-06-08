@@ -1,12 +1,11 @@
 import { switcher } from "~/App.tsx";
 import { PsdServer } from "~/lib/psd.ts";
 import { useContext, useState } from "preact/hooks";
-import { DefaultLayoutContext } from "~/layout/default.tsx";
+import { DefaultLayoutContext } from "~/layouts/default.tsx";
 import Credits from "~/pages/Home/Credits.tsx";
 import Loading from "~/components/Loading.tsx";
 // @deno-types=@loader-types/file.d.ts
 import worker from "../../service.worker.ts";
-import Button from "~/components/Button.tsx";
 
 export default function Home() {
   const context = useContext(DefaultLayoutContext);
@@ -19,11 +18,12 @@ export default function Home() {
     context.setPopup(<Loading name={file.name} />, (e) => e.preventDefault());
 
     file.arrayBuffer().then(async (buf) => {
-      const psd = PsdServer.instance;
+      const psd = new PsdServer();
       await psd.parse(buf);
       const psdStructure = (await psd.getStructure())!;
       context.setPopup(null);
       switcher.switch("viewer", {
+        server: psd,
         psdStructure,
         filename: file.name,
       });
@@ -66,13 +66,13 @@ export default function Home() {
             type="file"
             accept=".psd, .psb"
             onInput={(e) => onFileSubmit(e.currentTarget.files)}
-          >
-          </input>
+          />
           <p>ここにファイルをドロップ</p>
         </div>
       </div>
       <footer class="border shadow-inner rounded p-1 px-2 flex flex-row justify-center gap-4">
         <button
+          type="button"
           onClick={() => {
             context.setPopup(<Credits />);
           }}
@@ -81,7 +81,9 @@ export default function Home() {
           credit
         </button>
         {!installed && (
-          <Button
+          <button
+            type="button"
+            class="control-button"
             onClick={() => {
               const affirm = self.confirm(
                 "サービスワーカーをインストールしますか？\n- オフラインでもPSDAppが利用可能になります。",
@@ -92,7 +94,7 @@ export default function Home() {
             }}
           >
             install
-          </Button>
+          </button>
         )}
       </footer>
     </div>

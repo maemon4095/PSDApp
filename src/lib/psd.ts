@@ -12,11 +12,9 @@ export { createRenderer } from "psd/draw/mod.ts";
 import workerPath from "./psd.worker.ts";
 
 export class PsdServer {
-  static readonly instance = new PsdServer();
-
   readonly #worker: Worker;
 
-  private constructor() {
+  constructor() {
     this.#worker = new Worker(workerPath);
   }
 
@@ -84,7 +82,10 @@ export class PsdServer {
     });
   }
 
-  async update(id: number, props: Partial<PsdStructureConfigurableProps>) {
+  async update(
+    ...pairs:
+      readonly (readonly [number, Partial<PsdStructureConfigurableProps>])[]
+  ) {
     await new Promise<void>((resolve) => {
       const requestId = Math.random();
       const worker = this.#worker;
@@ -96,7 +97,7 @@ export class PsdServer {
         resolve();
       }
       worker.addEventListener("message", listener);
-      worker.postMessage({ type: "update", id: requestId, nodeId: id, props });
+      worker.postMessage({ type: "update", id: requestId, pairs });
     });
   }
 

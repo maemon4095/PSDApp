@@ -61,6 +61,7 @@ function Popup(
   },
 ) {
   if (children === undefined || children === null) {
+    // deno-lint-ignore jsx-no-useless-fragment
     return <></>;
   }
 

@@ -3,7 +3,7 @@ import type { ComponentChildren, JSX } from "preact";
 type Props = {
   type: string;
   children?: ComponentChildren;
-} & JSX.HTMLAttributes<HTMLInputElement>;
+} & JSX.InputHTMLAttributes<HTMLInputElement>;
 
 export default function TriggerInput({ children, ...attrs }: Props) {
   return (

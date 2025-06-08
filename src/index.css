@@ -44,6 +44,27 @@ h3 {
     animation: 1s linear infinite bg-blank-animate;
 }
 
+.psd-entry {
+    @apply flex flex-row items-center border -mb-px bg-stone-50 p-1 w-full gap-1
+}
+
+.psd-node:not([data-selected=true]) > .psd-entry  > .psd-entry-label  {
+    opacity: 0.3;
+}
+ 
+.psd-node:not([data-selected=true]) .psd-node > .psd-entry > .psd-entry-label  {
+    opacity: 0.3;
+}
+
+.psd-node:not([data-selected=true]) .pointer-none-when-not-selected  {
+    pointer-events: none;
+}
+
+.control-button {
+    @apply px-2 trigger
+}
+
+
 @keyframes bg-blank-animate {
     from {
         background-position: 0px 0px;
@@ -75,17 +96,6 @@ h3 {
     .child-center {
         display: grid;
         place-content: center;
-    }    
-
-    .attrhide[data-hidden=true] {
-        opacity: 0.3;
-    }
-    .attrhide[data-hidden=true] .attrhide {
-        opacity: 1.0
-    }
-
-    .pointer-none-on-attrhide[data-hidden=true] {
-        pointer-events: none;
     }
 
     .trigger {

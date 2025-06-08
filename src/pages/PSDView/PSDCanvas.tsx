@@ -1,16 +1,17 @@
-import type { JSX } from "preact";
-import { useEffect, useRef } from "preact/hooks";
-import { PsdServer, type PsdStructureRoot } from "~/lib/psd.ts";
+import type { JSX, RefObject } from "preact";
+import { useEffect } from "preact/hooks";
+import type { PsdServer, PsdStructureRoot } from "~/lib/psd.ts";
 import type { CanvasTransform } from "~/pages/PSDView/PSDCanvasArea.tsx";
 
 export default function PSDCanvas(
-  { psdStructure, transform }: {
+  { psdStructure, transform, server, canvasRef }: {
+    server: PsdServer;
     transform?: CanvasTransform;
     psdStructure: PsdStructureRoot;
+    canvasRef: RefObject<HTMLCanvasElement>;
   },
 ) {
-  const psd = PsdServer.instance;
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const psd = server;
 
   useEffect(() => {
     (async () => {

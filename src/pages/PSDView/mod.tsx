@@ -1,11 +1,12 @@
 import PsdStrucutureView from "~/pages/PSDView/PSDStructureView.tsx";
 import Partitioned from "~/components/Partitioned.tsx";
-import type { PsdStructureRoot } from "~/lib/psd.ts";
+import type { PsdServer, PsdStructureRoot } from "~/lib/psd.ts";
 import Header from "~/pages/PSDView/Header.tsx";
 import CanvasPane from "~/pages/PSDView/PSDCanvasPane.tsx";
 
 export default function PSDView(
-  { psdStructure, filename }: {
+  { psdStructure, filename, server }: {
+    server: PsdServer;
     psdStructure: PsdStructureRoot;
     filename: string;
   },
@@ -19,11 +20,13 @@ export default function PSDView(
           </Header>
           <div class="overflow-auto">
             <PsdStrucutureView
+              server={server}
               psdStructure={psdStructure}
             />
           </div>
         </div>
         <CanvasPane
+          server={server}
           psdStructure={psdStructure}
           filename={filename}
         />

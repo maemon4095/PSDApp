@@ -1,20 +1,10 @@
-import {
-  type Dispatch,
-  useContext,
-  useEffect,
-  useReducer,
-  useRef,
-} from "preact/hooks";
-import { PsdServer, type PsdStructureRoot } from "~/lib/psd.ts";
+import { type Dispatch, useEffect, useReducer, useRef } from "preact/hooks";
+import type { PsdServer, PsdStructureRoot } from "~/lib/psd.ts";
 import PSDCanvasArea, {
   type CanvasTransform,
 } from "~/pages/PSDView/PSDCanvasArea.tsx";
-import PSDCanvasProps from "~/pages/PSDView/PSDCanvasProps.tsx";
-import Button from "~/components/Button.tsx";
-import { switcher } from "~/App.tsx";
-import TriggerInput from "~/components/TriggerInput.tsx";
-import { DefaultLayoutContext } from "~/layout/default.tsx";
-import Loading from "~/components/Loading.tsx";
+import PSDCanvasPaneHeader from "~/pages/PSDView/PSDCanvasPaneHeader.tsx";
+import PSDCanvasPaneFooter from "./PSDCanvasPaneFooter.tsx";
 
 export const commandReset = Symbol();
 export const commandFit = Symbol();
@@ -26,12 +16,13 @@ export type CanvasTransformAction =
 export type CanvasTransformDispatch = Dispatch<CanvasTransformAction>;
 
 export default function CanvasPane(
-  { filename, psdStructure }: {
+  { filename, psdStructure, server }: {
     filename: string;
+    server: PsdServer;
     psdStructure: PsdStructureRoot;
   },
 ) {
-  const context = useContext(DefaultLayoutContext);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [transform, setTransform] = useReducer(
     (old: CanvasTransform, action: CanvasTransformAction) => {
       if (action === commandReset) {
@@ -68,44 +59,24 @@ export default function CanvasPane(
 
   return (
     <div class="grid grid-t-cols-[1fr] grid-t-rows-[auto_1fr_auto]">
-      <PSDCanvasProps transform={transform} setTransform={setTransform} />
+      <PSDCanvasPaneHeader
+        transform={transform}
+        setTransform={setTransform}
+        canvasRef={canvasRef}
+      />
       <PSDCanvasArea
+        canvasRef={canvasRef}
+        server={server}
         containerRef={canvasAreaRef}
         psdStructure={psdStructure}
         transform={transform}
         setTransform={setTransform}
       />
-      <div class="flex flex-row border-t p-1 text-sm gap-1">
-        <Button onClick={() => switcher.switch("home")}>✖</Button>
-        <TriggerInput
-          type="file"
-          accept=".psd, .psb"
-          onInput={(e) => {
-            const file = e.currentTarget.files?.[0];
-            if (!file) return;
-            context.setPopup(
-              <Loading name={file.name} />,
-              (e) => e.preventDefault(),
-            );
-            file.arrayBuffer().then(async (raw) => {
-              const psd = PsdServer.instance;
-              await psd.parse(raw);
-              const psdStructure = (await psd.getStructure())!;
-
-              context.setPopup(null);
-              switcher.switch("viewer", {
-                psdStructure,
-                filename: file.name,
-              });
-            });
-          }}
-        >
-          📂
-        </TriggerInput>
-        <span class="ml-auto">
-          {filename}@{psdStructure.width}x{psdStructure.height}
-        </span>
-      </div>
+      <PSDCanvasPaneFooter
+        filename={filename}
+        psdStructure={psdStructure}
+        server={server}
+      />
     </div>
   );
 }

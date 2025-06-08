@@ -1,16 +1,16 @@
-import type { JSX } from "preact";
+import type { JSX, RefObject } from "preact";
 import Header from "~/pages/PSDView/Header.tsx";
 import type { CanvasTransform } from "~/pages/PSDView/PSDCanvasArea.tsx";
-import Button from "~/components/Button.tsx";
 import {
   type CanvasTransformDispatch,
   commandFit,
 } from "~/pages/PSDView/PSDCanvasPane.tsx";
 
-export default function PSDCanvasProps(
-  { transform, setTransform }: {
+export default function PSDCanvasPaneHeader(
+  { transform, setTransform, canvasRef }: {
     transform?: CanvasTransform;
     setTransform: CanvasTransformDispatch;
+    canvasRef: RefObject<HTMLCanvasElement>;
   },
 ) {
   return (
@@ -33,12 +33,34 @@ export default function PSDCanvasProps(
           onInput={(scale) => setTransform({ scale })}
         />
       </div>
-      <Button onClick={() => setTransform({ scale: 1 })}>
+      <button
+        type="button"
+        class="control-button"
+        onClick={() => setTransform({ scale: 1 })}
+      >
         原寸大
-      </Button>
-      <Button onClick={() => setTransform(commandFit)}>
+      </button>
+      <button
+        type="button"
+        class="control-button"
+        onClick={() => setTransform(commandFit)}
+      >
         fit
-      </Button>
+      </button>
+
+      <button
+        type="button"
+        class="control-button ml-auto"
+        onClick={() => {
+          const canvas = canvasRef.current;
+          if (canvas === null) return;
+
+          canvas.toBlob((blob) => {
+          });
+        }}
+      >
+        保存
+      </button>
     </Header>
   );
 }
