@@ -1,15 +1,20 @@
-import tailwindcss from "npm:tailwindcss";
+import tailwindcss from "npm:tailwindcss@3.4.17";
 import tailwindConfig from "./tailwind.config.js";
-import * as path from "jsr:@std/path";
-import * as esbuild from "npm:esbuild";
-import dataUrlAsExternalPlugin from "jsr:@maemon4095-esbuild-x/plugin-data-url-as-external";
+import * as path from "@std/path";
+import * as esbuild from "npm:esbuild@0.21";
+import dataUrlAsExternalPlugin from "jsr:@maemon4095-esbuild-x/plugin-data-url-as-external@0.0.1";
 import importWebWorker from "jsr:@maemon4095-esbuild-x/plugin-import-web-worker@0.1.0";
-import postcss from "jsr:@maemon4095-esbuild-x/plugin-postcss";
+import postcss, { type AcceptedPlugin } from "npm:postcss@8.5";
 import generateIndexFile, {
   linking,
 } from "jsr:@maemon4095-esbuild-x/plugin-generate-index-file@0.1.2";
 import loaderOverride from "jsr:@maemon4095-esbuild-x/plugin-loader-override@0.1.0";
-import { denoPlugins } from "jsr:@luca/esbuild-deno-loader";
+import { denoPlugins } from "jsr:@luca/esbuild-deno-loader@0.11.1";
+import {
+  createResolverFromImportMap,
+  defaultResolve,
+  type ImportMap,
+} from "jsr:@maemon4095-esbuild-x/util-resolver@0.0";
 
 const mode = Deno.args[0];
 switch (mode) {
@@ -52,11 +57,7 @@ const context = await esbuild.context({
         "clean-outdir",
       ],
     }),
-    postcss({
-      plugins: [
-        tailwindcss(tailwindConfig),
-      ],
-    }),
+    postCssPlugin({ plugins: [tailwindcss(tailwindConfig)] }),
     generateIndexFile({
       staticFiles: [
         {
@@ -105,6 +106,40 @@ function cleanOutdir(): esbuild.Plugin {
         } catch {
           console.log("Failed to clear outdir.");
         }
+      });
+    },
+  };
+}
+
+export type Options = {
+  plugins?: AcceptedPlugin[];
+  importMap?: string | ImportMap;
+};
+export default function postCssPlugin(options: Options): esbuild.Plugin {
+  const name = "postCssPlugin";
+  const { plugins, importMap: importMapOrPath } = options;
+
+  const importMapResolver = createResolverFromImportMap(importMapOrPath ?? {});
+
+  return {
+    name,
+    setup(build) {
+      build.onResolve({ filter: /.*\.css/ }, (args) => {
+        return {
+          path: importMapResolver(args.path) ?? defaultResolve(args),
+          namespace: name,
+        };
+      });
+
+      build.onLoad({ filter: /.*/, namespace: name }, async (args) => {
+        const cssdata = await Deno.readFile(args.path);
+        const cssfile = new TextDecoder().decode(cssdata);
+
+        const result = await postcss(plugins).process(cssfile, {
+          from: args.path,
+        });
+
+        return { contents: result.css, loader: "css" };
       });
     },
   };
