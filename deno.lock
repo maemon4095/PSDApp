@@ -8,6 +8,7 @@
     "jsr:@maemon4095-esbuild-x/plugin-loader-override@0.1.0": "0.1.0",
     "jsr:@maemon4095-esbuild-x/util-resolver@0.0": "0.0.1",
     "jsr:@maemon4095-esbuild-x/util-resolver@0.0.0": "0.0.0",
+    "jsr:@maemon4095/imagedata-blender-gl@0.1": "0.1.0",
     "jsr:@maemon4095/path@0.0.0": "0.0.0",
     "jsr:@std/assert@0.226": "0.226.0",
     "jsr:@std/bytes@^1.0.2": "1.0.6",
@@ -19,7 +20,8 @@
     "npm:esbuild@0.21": "0.21.5",
     "npm:postcss@8.5": "8.5.4",
     "npm:preact@^10.26.0": "10.26.8",
-    "npm:tailwindcss@3.4.17": "3.4.17_postcss@8.5.4"
+    "npm:tailwindcss@3.4.17": "3.4.17_postcss@8.5.4",
+    "npm:typescript@*": "5.8.3"
   },
   "jsr": {
     "@luca/esbuild-deno-loader@0.11.1": {
@@ -71,6 +73,9 @@
         "jsr:@std/path@0.225",
         "npm:esbuild"
       ]
+    },
+    "@maemon4095/imagedata-blender-gl@0.1.0": {
+      "integrity": "1f6680de12fbe39d7f74a50bfff6983e4a370f7b3f270be28e211500dbb8e54e"
     },
     "@maemon4095/path@0.0.0": {
       "integrity": "22269ec9fddbc49dfbe88ae4241615b101add3e49650911aba4e13c53984449f"
@@ -790,6 +795,10 @@
     "ts-interface-checker@0.1.13": {
       "integrity": "sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA=="
     },
+    "typescript@5.8.3": {
+      "integrity": "sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==",
+      "bin": true
+    },
     "undici-types@6.21.0": {
       "integrity": "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="
     },
@@ -823,6 +832,58 @@
       "integrity": "sha512-4lLa/EcQCB0cJkyts+FpIRx5G/llPxfP6VQU5KByHEhLxY3IJCH0f0Hy1MHI8sClTvsIb8qwRJ6R/ZdlDJ/leQ==",
       "bin": true
     }
+  },
+  "redirects": {
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src//util/parse/mod.ts": "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/util/parse/mod.ts"
+  },
+  "remote": {
+    "https://raw.githubusercontent.com/maemon4095/SourceGenerator.ts/main/findTarget.ts": "ba7ec9aa62b814381ef295a2ea3ec1716cdf113befbcf3cdbec4d6ac70dbcc38",
+    "https://raw.githubusercontent.com/maemon4095/SourceGenerator.ts/main/mod.ts": "e9cadc6872bf7b4a34b82b017c7952667605353f0fc368d4a789656d43589f1e",
+    "https://raw.githubusercontent.com/maemon4095/SourceGenerator.ts/main/util.ts": "e050bca6b6e58fe648cb534c42e004576cda79ce8dab902b77ad0638081a3928",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/compression/mod.ts": "804a7f0f43e9dd5b1f876c89107c2ed932ff93c33f28475dc5514c67ee183f47",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/decoding/decodeImageChannel.ts": "d4751b6f709cecfb769f3d4f51abc911fd5429f9b6642c5022b42284748802dd",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/decoding/decodeLayer.ts": "3bbf78cdd96ac489da942e2aea8565958e0a9f5fcc8643f86bef05d9c4769fd6",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/decoding/imageDataSection.ts": "ef8265b0c1b18427ddfee6b32ed99ca246da1da73d1e4d1dd885b7a36fc7585e",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/decoding/mod.ts": "b32de5bcc28c38940d3fe0d5b04486f1586b6bae23ab059a499a070400ebe245",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/draw/mod.ts": "d3fd3626a5961b3178c43d0359aaf6a98170c741e763dcb45ad17a6ef67f55a9",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/mod.ts": "81473c0632022013b081af0aeeae40114b958be54de9d8ca4faaef15368a1ccd",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/AdditionalLayerInformation/BlendClippingElements.ts": "76e9971a22e606f3ad3a2c22e61b86995aa65450def0f92731576c48ce43c681",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/AdditionalLayerInformation/BlendInteriorElements.ts": "4f1b3dc98f3b28dc5329eee2e8f07fed1120463cf445c897300e1bc5a6e9858f",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/AdditionalLayerInformation/KnockoutSetting.ts": "3c5d7a10bd7d63620fc3bff227b31d2d4cec05f2e602c8fc2285fe897ea9a43a",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/AdditionalLayerInformation/LayerId.ts": "ef5a0a4435617fcd83b3dcf4daca0412a9d2b8389b528ca3e7bdc7f5089355ff",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/AdditionalLayerInformation/ProtectedSetting.ts": "af518c3e5d3b42453fdc3a1b8c3597ebe952e5f5540bacd62b7d818d117f05b7",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/AdditionalLayerInformation/SectionDividerSetting.ts": "af002d04a994bdd0ca9a3b0f4a1f3d8c46ae2d5ac3a77a1e231a4f99bd0f6d97",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/AdditionalLayerInformation/SheetColorSetting.ts": "ff3d53589f70b224b7f0620afe0008b3c3d84bf88cf7499faac6a7c227c50e73",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/AdditionalLayerInformation/UnicodeLayerName.ts": "1ad50404ac336d82965b5502a805f66eca931fed67b6a482dd55b912ecccf8b8",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/AdditionalLayerInformation/Unsupported.ts": "8731caf477a3f74183ddfecce886741a4738037ac22c342e94b117a4c7270fd6",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/AdditionalLayerInformation/helper.gen.ts": "2c19d915ceae681a659caf0c959e2d8b25d89aa7129609d54bff092756a4a176",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/AdditionalLayerInformation/mod.ts": "66f42875a979d0821402156006bddaf2ede172e9e40d91fe610ea41934367bdc",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/AdditionalLayerInformation/parseData.ts": "59d819f9c9c427d2dc4be9c7b63a1b5952062284d30657a83e0462e2fe163ee6",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/BlendMode.gen.ts": "1b313aecf038b06570899e434139c5d488987606cdce1880f57841f2cf79dc1e",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/ColorModeDataSection.ts": "54a60202be8d820f30daf6d8b5c8c59ee6d297c8d9bb1f92280393810d0a133b",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/FileHeaderSection.ts": "048d08d545373add8c7e1274df19008474f61d9dd5a56a25fc9c33eddcf53f6d",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/GlobalLayerMaskInfo.ts": "924d688f89c5c90e64e3140d2e384547b9eb6244e4f5161533086454be1ccb2c",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/ImageChannel.ts": "e0978f8cea1f5cc544a17fe3f75593b1662e2d82b4057181abbfeda1e08f5e8b",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/ImageCompression.ts": "b555b48727673812e677f6fca03eb9aaaa2a8bdee1a4149ba755b059bf59772e",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/ImageDataSection.ts": "a96cd5f76a3edd5c0b68c236b1ec65490c720c2d415c940dc678d7ea50894ee9",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/ImageResourceBlock.ts": "dbf42e22101c52e723e3733ce64542cdb1add50384e03052fda9fcc44bdd3440",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/ImageResourcesSection.ts": "e7dcae74fcf256b7f3980666077c779fb9dd6e00191ac3f4fb45007b0a85365d",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/LayerAndMaskInformationSection.ts": "cb73e262cc174128588800d775a4cb5fccd711993cb17d441ac8558b1667a2d6",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/LayerBlendingRanges.ts": "e3d3ffae1a30c52b647e0099b9b59bb5d8dfef18e6de2d55707f898fbab7a67e",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/LayerInfo.ts": "07e9fca412955503f1740846cf4173afba1061e00776e5758484f7da5d827a30",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/LayerMask.ts": "19e9db88470dd780b8880845949e264e9a4dd7517773b0a080ff1bbbbdf2d277",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/LayerRecords.ts": "2778d0f07474e006bbc232592d0571f48b23514ce3712b205de8ef470faf7790",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/PascalString.ts": "da3a47484f202a7d039d243bce9ae6eeb72001e9aed5f27aa8237f59ad551e76",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/Rectangle.ts": "e674df3584148592c49b5a7caf87c222f1d6eb44a95562930c9bf052310f28f8",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/SyntaxError.ts": "1d363a0cda15ea182ea5851c8a71a75041d33bce358b42d20a98b5806e0c81e3",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/UnicodeString.ts": "fad792288adda7a412fdb82521f9a4c253c2528c53939baa9523174f7db8963f",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/parse/mod.ts": "8a71282608c9bec581527c283283461c1e7d18de875c18a46ba195a31d83f608",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/structure/mod.ts": "74d0d5be86e3ff59383856308a416a77c58bdc35f8dd6fee132f3a009c0b8deb",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/util/collections/mod.ts": "354bd33d3a2c20b61a4bea83e0e545ab849143adbec8f3aef5f712676669a17c",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/util/encoding/mod.ts": "254fe2bfaca7d5ed45aed4be59da2472089f02eb7b7dabf0c2c970fd9427e897",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/src/util/parse/mod.ts": "34e0d43b03ebacb2c9c4073ce249a2259d4e79e048d2c4f8af18b6218eef22a2",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/tools/GenerateTrie/generator.ts": "d388b6860c828354cc3e29b9b9f9b5090ad2e330b86c0a3d2cb6f54aedd4d1c1",
+    "https://raw.githubusercontent.com/maemon4095/photoshop-utils/release/v0.2.0/tools/GenerateTrie/mod.ts": "fe00dd9ff60bebfeb29a7928370c7acc3fc35887cc80970bdf18facb02e779fc"
   },
   "workspace": {
     "dependencies": [
